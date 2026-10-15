@@ -14,10 +14,14 @@ lo que no encuentra.
 Dentro de la carpeta de tu proyecto:
 
 ```sh
-npx skills add https://github.com/BrandonFilth/polkadot-products-devnet --skill polkadot-products-devnet
+npx skills@1.7.2 add https://github.com/BrandonFilth/polkadot-products-devnet --skill polkadot-products-devnet
 ```
 
-El CLI muestra un menú para elegir en qué agentes instalarla y si copiar o enlazar los archivos.
+El CLI muestra un menú para elegir en qué agentes instalarla, el alcance y si copiar o enlazar los
+archivos. En **Installation scope** elegir **Project** (solo este proyecto).
+
+Usar la versión fija `skills@1.7.2`: sin versión, `npx` puede usar una más vieja que tenga en caché
+(por ejemplo 1.5.18, que no instala en Kiro aunque se elija en el menú).
 El paquete `skills` 1.7.2 declara Node ≥ 22.20.0; con Node 22.18 solo muestra un aviso
 `EBADENGINE` y funciona. Recomendado: Node 24 LTS.
 
@@ -25,11 +29,11 @@ Para elegir el agente desde el comando (sin menú de agentes):
 
 ```sh
 # Kiro
-npx skills add https://github.com/BrandonFilth/polkadot-products-devnet --skill polkadot-products-devnet -a kiro-cli
+npx skills@1.7.2 add https://github.com/BrandonFilth/polkadot-products-devnet --skill polkadot-products-devnet -a kiro-cli
 # Claude Code
-npx skills add https://github.com/BrandonFilth/polkadot-products-devnet --skill polkadot-products-devnet -a claude-code
+npx skills@1.7.2 add https://github.com/BrandonFilth/polkadot-products-devnet --skill polkadot-products-devnet -a claude-code
 # Cursor, GitHub Copilot, Codex (todos leen .agents/skills/)
-npx skills add https://github.com/BrandonFilth/polkadot-products-devnet --skill polkadot-products-devnet -a cursor
+npx skills@1.7.2 add https://github.com/BrandonFilth/polkadot-products-devnet --skill polkadot-products-devnet -a cursor
 ```
 
 - En Windows, agregar `--copy` si los enlaces simbólicos fallan (copia los archivos en vez de enlazarlos).
@@ -37,7 +41,7 @@ npx skills add https://github.com/BrandonFilth/polkadot-products-devnet --skill 
   antes de instalar.
 - **No usar `-g`**: instala para todos los proyectos del usuario. Esta skill está pensada por proyecto.
 - Para ver qué contiene el repositorio sin instalar nada:
-  `npx skills add https://github.com/BrandonFilth/polkadot-products-devnet --list`.
+  `npx skills@1.7.2 add https://github.com/BrandonFilth/polkadot-products-devnet --list`.
 - Instalación manual: copiar la carpeta `skills/polkadot-products-devnet/` a la carpeta de skills de
   tu agente (p. ej. `.kiro/skills/`, `.claude/skills/` o `.agents/skills/`).
 
