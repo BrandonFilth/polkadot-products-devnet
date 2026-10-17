@@ -52,7 +52,10 @@ Todo está ajustado a **Products Devnet** y a las versiones de `references/versi
 - **Simular antes de firmar:** `.query()` antes de cada `.tx()`. Una firma a la vez.
 - **Gas de la app:** PGAS vía `SmartContractAllowance`; el usuario final no necesita PAS.
 - **Vite:** `base: './'`.
-- **Publicar:** `pad` y `dotns` siempre con `--env devnet`; `pad` con `--js-merkle`.
+- **Publicar:** `pad` y `dotns` siempre con `--env devnet`; `pad` con `--js-merkle`. No usar
+  `pad login` (BUG-007): subir con el *pool* a un nombre desechable `tmp-<fecha>.dot`, copiar el CID
+  y pegarlo en el `contenthash` del nombre propio desde `dotns.dot` en el Host
+  (`references/publicar.md`, sección 2).
 - **Secretos:** nunca pedir, leer, escribir ni mostrar mnemónicos, llaves privadas o `.env` con
   secretos. Solo cuentas de testnet.
 

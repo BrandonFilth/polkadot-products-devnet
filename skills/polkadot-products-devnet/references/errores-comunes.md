@@ -58,6 +58,8 @@ Formato: **síntoma → causa → solución**. Si un síntoma no está aquí, bu
 | `pad` sube a otra red | Faltó `--env devnet` (por defecto: `paseo-next-v2`) | `--env devnet` o `$env:PAD_ENV = "devnet"` |
 | `pad` pide el binario Kubo | Faltó `--js-merkle` | Agregar `--js-merkle` |
 | `not authorized` al subir con el *pool* | Parte del *pool* tiene la autorización vencida | Repetir el comando |
+| `pad login`: `did not return the product account key within 25s` y luego `Allocation request timed out after 60s` | Fallo conocido del login móvil en Products Devnet (BUG-007): no llegan la cuenta del Product ni los recursos | No usar `pad login`: subir con el *pool* a un nombre desechable y pegar el CID en tu nombre desde `dotns.dot` (`publicar.md`, sección 2) |
+| `pad` registró un nombre que no es el tuyo | Con el *pool*, el nombre que le pasas queda a nombre de una cuenta compartida | Usar siempre un nombre desechable (`tmp-<fecha>.dot`) y solo copiar el CID |
 | No deja cambiar el `contenthash` | La cuenta no es dueña del nombre; la delegación no se respeta | Hacerlo con la cuenta dueña o desde `dotns.dot` → Profile → Edit |
 | Icono en blanco | Icono subido como UnixFS (`bafybei…`) | Subirlo con `pad` (blob crudo blake2b, `bafk2bza…`) |
 | La tarjeta aparece pero la app no abre | Hay `manifest` pero falta `app.<nombre>.dot` con `contenthash` y `executable` | Publicar con `polkadot-app-deploy.config.ts` (`publicar.md`) |

@@ -44,15 +44,50 @@ El registro con `dotns register domain` no se repitió el 2026-10-15: **POR VERI
 
 ## 2. Subir el bundle
 
+**Flujo recomendado en Products Devnet** (el nombre es de la cuenta del teléfono):
+
+1. Comprar el nombre en la Polkadot App (`dotns.dot`).
+2. Subir el bundle con el *pool* a un **nombre desechable** y copiar el CID.
+3. Pegar el CID en el `contenthash` del nombre comprado desde `dotns.dot` (sección 3) y firmar solo
+   esa actualización en el teléfono.
+4. Abrir el nombre desde el Host y comprobar que carga.
+
+No usar `pad login` para este flujo: ver *Login móvil de `pad` (BUG-007)* abajo.
+
 ```powershell
 pnpm build
-pad .\dist mi-app-hackaton.dot --env devnet --js-merkle
+pad logout
+# Nombre desechable con marca de tiempo: no le quita un nombre útil a nadie.
+$tmp = "tmp-$(Get-Date -Format 'yyyyMMddHHmmss').dot"
+pad .\dist $tmp --env devnet --js-merkle --no-manifest
 ```
 
-- Éxito = `Verified on-chain` y un CID.
+En macOS/Linux: `tmp="tmp-$(date +%Y%m%d%H%M%S).dot"` y `pad ./dist "$tmp" --env devnet --js-merkle --no-manifest`.
+
+- Éxito = `Verified on-chain` y un CID. Copiar el CID; es lo único que se usa.
+- `pad` no tiene un modo de "solo subir": siempre registra o actualiza el nombre que recibe
+  (`pad --help` 0.16.7). Por eso el nombre desechable: queda a nombre de una cuenta compartida del
+  *pool* y los nombres de DotNS no expiran.
 - Sin mnemónico ni sesión (`pad logout`), `pad` sube con un *pool* de cuentas ya autorizadas en
-  Bulletin. Si dice `not authorized`, repetir. En ese modo el nombre queda a nombre de una cuenta
-  compartida; solo sirve el CID.
+  Bulletin. Si dice `not authorized`, repetir.
+- `--no-manifest` evita que `pad` escriba icono y descripción en el nombre desechable; el manifest se
+  agrega a mano en el nombre real (sección 4).
+- Cuántas subidas seguidas aguanta el *pool* (por ejemplo, un grupo de 40 personas):
+  **POR VERIFICAR**.
+
+### Login móvil de `pad` (BUG-007)
+
+En Products Devnet, `pad login --env devnet` empareja con la Polkadot App, pero después:
+
+- `Your wallet did not return the product account key within 25s`: no se obtiene la cuenta del
+  Product, así que no se puede mostrar ni fondear.
+- `Allowance pre-warm failed: Allocation request timed out after 60s` y
+  `Bulletin storage slot: not allocated`: no hay espacio propio en Bulletin y `pad` usa el *pool*.
+
+Cerrar sesión y repetir lo reproduce. La consulta `dotns pop status --signer qr` muestra la cuenta
+del worker y no la del teléfono, así que no sirve para saber el estado PoP de tu cuenta. Mientras
+siga así, usar el flujo recomendado de arriba. Observado por el equipo con `pad` 0.16.7 en octubre de
+2026.
 - Con mnemónico propio (cuenta de **testnet**), leído de la variable `MNEMONIC` para que no quede en
   el historial:
 
@@ -72,8 +107,9 @@ Fuente de esta sección: pruebas del equipo (subida con el *pool* probada el
 
 - Si la cuenta del keystore de `dotns` es **dueña** del nombre:
   `dotns content set mi-app-hackaton.dot <CID> --env devnet`.
-- Si el nombre es de la cuenta del teléfono: abrir `dotns.dot` dentro del Host → *Profile* → el
-  nombre → **Edit**, pegar el CID y firmar en el teléfono.
+- Si el nombre es de la cuenta del teléfono (el caso normal): abrir `dotns.dot` dentro del Host
+  (Polkadot App o Desktop) → *Profile* → el nombre → **Edit**, pegar el CID en `contenthash` y
+  firmar en el teléfono.
 - Con `dotns` 0.9.5 y `pad` 0.16.7 **solo el dueño** puede cambiar el `contenthash`; la delegación
   no se respeta.
 
@@ -105,6 +141,13 @@ Reglas:
   no abre. Con el config de arriba, `pad` escribe los registros en el nombre y sus subnombres `app`,
   `widget`, `funding` y `worker` (`pad --help`, opción `--config`).
 - `--no-manifest` publica solo el contenido aunque exista el config.
+
+**A mano, con el nombre del teléfono.** Con el flujo recomendado `pad` no escribe el manifest en tu
+nombre. Se agrega desde `dotns.dot` → *Profile* → el nombre → **Edit** → *Edit Profile Records* →
+*Custom Records* → **Add Record**, con la clave y el valor de cada registro, y se firma en el
+teléfono. Así lo hizo el equipo con la app de referencia. El formato exacto de las claves y valores
+del manifest y si hace falta el subnombre `app.` en este modo: **POR VERIFICAR** (copiar los que
+escribe `pad` en un nombre de prueba con `polkadot-app-deploy.config.ts`).
 
 Fuente: pruebas del equipo con la app de referencia. El flujo completo con
 `manifest` + subnombre `app.` no se repitió el 2026-10-15: **POR VERIFICAR**.
