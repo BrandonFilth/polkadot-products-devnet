@@ -99,7 +99,7 @@ const gas = await requestResourceAllocation([
 ```
 
 En la app de referencia `dappName` y el id del Product salen del dominio (`productId`), que se deduce de
-la URL (`localhost:5173`, `mi-app.dot`, `mi-app.dot.li` → `mi-app.dot`).
+la URL (`mi-app.dot`, `mi-app.dot.li` → `mi-app.dot`).
 
 ## Leer: `.query()`
 
