@@ -57,22 +57,28 @@ No usar `pad login` para este flujo: ver *Login móvil de `pad` (BUG-007)* abajo
 ```powershell
 pnpm build
 pad logout
-# Nombre desechable con marca de tiempo: no le quita un nombre útil a nadie.
-$tmp = "tmp-$(Get-Date -Format 'yyyyMMddHHmmss').dot"
+# Nombre desechable abierto: DotNS permite cero o exactamente dos dígitos finales.
+$tmp = "tmp-image-stress04.dot"
 pad .\dist $tmp --env devnet --js-merkle --no-manifest
 ```
 
-En macOS/Linux: `tmp="tmp-$(date +%Y%m%d%H%M%S).dot"` y `pad ./dist "$tmp" --env devnet --js-merkle --no-manifest`.
+En macOS/Linux: `tmp="tmp-image-stress04.dot"` y `pad ./dist "$tmp" --env devnet --js-merkle --no-manifest`.
 
 - Éxito = `Verified on-chain` y un CID. Copiar el CID; es lo único que se usa.
 - `pad` no tiene un modo de "solo subir": siempre registra o actualiza el nombre que recibe
   (`pad --help` 0.16.7). Por eso el nombre desechable: queda a nombre de una cuenta compartida del
   *pool* y los nombres de DotNS no expiran.
-- Sin mnemónico ni sesión (`pad logout`), `pad` sube con un *pool* de cuentas ya autorizadas en
-  Bulletin. Si dice `not authorized`, repetir.
+- **No pasar a `pad` un nombre que ya tiene dueño** (por ejemplo, el que compraste en el teléfono).
+  `pad` intenta escribir su `contenthash` con el worker y falla por diferencia de propietario. El
+  CID se pega a mano en el nombre propio (sección 3).
+- **Correr `pad` fuera de la carpeta del proyecto o con `--no-manifest`.** `pad` busca un
+  `polkadot-app-deploy.config.ts` subiendo desde la carpeta del build; si lo encuentra, usa su
+  `domain` y escribe el manifest ahí.
 - `--no-manifest` evita que `pad` escriba icono y descripción en el nombre desechable; el manifest se
   agrega a mano en el nombre real (sección 4).
-- Cuántas subidas seguidas aguanta el *pool* (por ejemplo, un grupo de 40 personas):
+- Probado el 2026-10-18 con `pad` 0.16.7 en Windows: un bundle de 2 archivos (21 KB) se subió con la
+  cuenta 0 del *pool* en 3 min 28 s; un intento anterior cayó en la cuenta 3, sin autorización.
+  Cuántas subidas seguidas aguanta el *pool* (por ejemplo, un grupo de 40 personas):
   **POR VERIFICAR**.
 
 ### Login móvil de `pad` (BUG-007)

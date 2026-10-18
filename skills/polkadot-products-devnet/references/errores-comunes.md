@@ -49,6 +49,7 @@ Formato: **síntoma → causa → solución**. Si un síntoma no está aquí, bu
 | Una firma nunca llega al teléfono | Otra firma sigue pendiente; el Host atiende una a la vez | Esperar a que termine la anterior; no firmar en segundo plano |
 | `timeout` al firmar | El usuario no aprobó a tiempo; la tx pudo entrar | Leer el estado del contrato antes de reintentar |
 | El revert solo aparece al firmar | Se llamó `.tx()` sin simular | Llamar `.query()` antes y mostrar el motivo del revert |
+| "Conectar" o la firma no hacen nada en `localhost` | La Polkadot App no abre `localhost`; la conexión y las firmas necesitan la app publicada | Publicar en tu `.dot` y probar desde ahí (`app-sdk.md`, *Dónde probar*) |
 | Direcciones distintas en `localhost` y en `.dot` | La cuenta del Product se deriva del dominio | Configurar admins y dueños desde el dominio final |
 
 ## Publicación
@@ -59,6 +60,9 @@ Formato: **síntoma → causa → solución**. Si un síntoma no está aquí, bu
 | `pad` pide el binario Kubo | Faltó `--js-merkle` | Agregar `--js-merkle` |
 | `not authorized` al subir con el *pool* | Parte del *pool* tiene la autorización vencida | Repetir el comando |
 | `pad login`: `did not return the product account key within 25s` y luego `Allocation request timed out after 60s` | Fallo conocido del login móvil en Products Devnet (BUG-007): no llegan la cuenta del Product ni los recursos | No usar `pad login`: subir con el *pool* a un nombre desechable y pegar el CID en tu nombre desde `dotns.dot` (`publicar.md`, sección 2) |
+| `Name has 14 trailing digits; DotNS allows exactly 0 or 2 trailing digits` | El nombre termina en números (marca de tiempo) | Convertir los dígitos a letras: `tmpcacgbabiaebjec.dot` (`publicar.md`, sección 2) |
+| `pool account N … is not authorized (or its authorization expired)` | Esa cuenta del *pool* venció en Bulletin | Repetir el mismo comando: toma otra cuenta |
+| `pad` falla por propietario con tu propio nombre | Le pasaste a `pad` el nombre que es de tu teléfono; `pad` firma con su worker | Darle a `pad` un nombre desechable y pegar el CID a mano en el tuyo |
 | `pad` registró un nombre que no es el tuyo | Con el *pool*, el nombre que le pasas queda a nombre de una cuenta compartida | Usar siempre un nombre desechable (`tmp-<fecha>.dot`) y solo copiar el CID |
 | No deja cambiar el `contenthash` | La cuenta no es dueña del nombre; la delegación no se respeta | Hacerlo con la cuenta dueña o desde `dotns.dot` → Profile → Edit |
 | Icono en blanco | Icono subido como UnixFS (`bafybei…`) | Subirlo con `pad` (blob crudo blake2b, `bafk2bza…`) |

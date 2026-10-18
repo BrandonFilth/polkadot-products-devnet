@@ -7,6 +7,16 @@ firma. La app no tiene backend.
 Todo lo de este archivo sigue la app de referencia del equipo, probada con `@parity/product-sdk` 0.27.0. Las firmas de funciones pueden
 cambiar en otras versiones del SDK.
 
+## Dónde probar: `localhost` no basta
+
+- **La Polkadot App no abre `localhost`.** Conectar la cuenta, firmar, pedir PGAS o guardar algo en
+  el contrato solo se prueba con la app **publicada en su dominio `.dot`** y abierta desde el Host.
+- `pnpm dev` en `localhost:5173` sirve para la parte visual y las lecturas por ETH-RPC (en el
+  navegador o en Desktop), no para la conexión ni las firmas.
+- Ciclo de trabajo: cambiar → `pnpm build` → publicar (`publicar.md`, sección 2: subir con el *pool*
+  y pegar el CID en el `contenthash`) → abrir `tu-app.dot` → probar. Cada CID nuevo se pega otra vez.
+- No decirle al usuario "pruébalo en localhost dentro de la Polkadot App": no funciona.
+
 ## Reglas del sandbox
 
 - **Fuera de un Host la app no funciona.** Comprobarlo al inicio con `isInsideContainer()` y mostrar
