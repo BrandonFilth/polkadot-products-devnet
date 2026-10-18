@@ -57,14 +57,33 @@ No usar `pad login` para este flujo: ver *Login móvil de `pad` (BUG-007)* abajo
 ```powershell
 pnpm build
 pad logout
-# Nombre desechable abierto: DotNS permite cero o exactamente dos dígitos finales.
-$tmp = "tmp-image-stress04.dot"
+# Nombre desechable único: "tmp" + la fecha y hora convertidas a letras (0→a … 9→j).
+# DotNS solo acepta 0 o 2 dígitos al final, así que el nombre no lleva números.
+$ts  = Get-Date -Format 'yyyyMMddHHmmss'
+$tmp = 'tmp' + (-join ($ts.ToCharArray() | ForEach-Object { [char](97 + [int]"$_") })) + '.dot'
 pad .\dist $tmp --env devnet --js-merkle --no-manifest
 ```
 
-En macOS/Linux: `tmp="tmp-image-stress04.dot"` y `pad ./dist "$tmp" --env devnet --js-merkle --no-manifest`.
+En macOS/Linux:
 
-- Éxito = `Verified on-chain` y un CID. Copiar el CID; es lo único que se usa.
+```bash
+tmp="tmp$(date +%Y%m%d%H%M%S | tr '0-9' 'a-j').dot"
+pad ./dist "$tmp" --env devnet --js-merkle --no-manifest
+```
+
+- Éxito = `Verified on-chain` y la línea `CID: bafy…` al final (el *Root CID*). Copiar ese CID; es
+  lo único que se usa. Las líneas `bafkrei…` de arriba son los trozos, no el CID de la app.
+- Reglas del nombre desechable: 9 caracteres o más (sin Proof of Personhood) y **0 o 2 dígitos al
+  final**. Con la marca de tiempo en números (`tmp-20261018041751`) `pad` falla con
+  `Name has 14 trailing digits; DotNS allows exactly 0 or 2 trailing digits`. Un nombre fijo
+  compartido (por ejemplo `tmp-image-stress04.dot`) solo sirve una vez: el siguiente que lo use
+  choca con un nombre que ya tiene dueño.
+- `pad` sin sesión firma DotNS con su worker de desarrollo (`5DfhGy…` / `0x35cd…`) y sube con una
+  cuenta del *pool*. No usa el keystore de `dotns` ni un mnemónico propio. El nombre desechable queda
+  a nombre de ese worker.
+- Si sale `Bulletin storage account pool account N (…) is not authorized (or its authorization
+  expired)`, repetir el mismo comando: cada intento toma otra cuenta del *pool*.
+- Comprobación rápida sin el Host: `https://<nombre>.dev-dot.li` muestra el bundle subido.
 - `pad` no tiene un modo de "solo subir": siempre registra o actualiza el nombre que recibe
   (`pad --help` 0.16.7). Por eso el nombre desechable: queda a nombre de una cuenta compartida del
   *pool* y los nombres de DotNS no expiran.
