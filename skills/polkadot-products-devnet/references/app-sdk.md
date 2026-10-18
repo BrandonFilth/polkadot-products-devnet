@@ -7,15 +7,20 @@ firma. La app no tiene backend.
 Todo lo de este archivo sigue la app de referencia del equipo, probada con `@parity/product-sdk` 0.27.0. Las firmas de funciones pueden
 cambiar en otras versiones del SDK.
 
-## Dónde probar: `localhost` no basta
+## Dónde probar: solo en un dominio `.dot`
 
-- **La Polkadot App no abre `localhost`.** Conectar la cuenta, firmar, pedir PGAS o guardar algo en
-  el contrato solo se prueba con la app **publicada en su dominio `.dot`** y abierta desde el Host.
-- `pnpm dev` en `localhost:5173` sirve para la parte visual y las lecturas por ETH-RPC (en el
-  navegador o en Desktop), no para la conexión ni las firmas.
+- **Ningún Host se conecta a `localhost`:** ni la Polkadot App del teléfono ni Polkadot Desktop.
+  Conectar la cuenta, firmar, pedir PGAS o guardar algo en el contrato solo se prueba con la app
+  **publicada en su dominio `.dot`** y abierta desde el Host. Comprobado por el equipo en octubre
+  de 2026 con Desktop 0.1.3 y la Polkadot App del devnet.
+- `pnpm dev` (`localhost:5173`) sirve solo en un navegador normal, para la parte visual y las
+  lecturas por ETH-RPC. Ahí `isInsideContainer()` es `false` y la app debe mostrar que está fuera del
+  Host.
 - Ciclo de trabajo: cambiar → `pnpm build` → publicar (`publicar.md`, sección 2: subir con el *pool*
-  y pegar el CID en el `contenthash`) → abrir `tu-app.dot` → probar. Cada CID nuevo se pega otra vez.
-- No decirle al usuario "pruébalo en localhost dentro de la Polkadot App": no funciona.
+  y pegar el CID en el `contenthash`) → abrir `tu-app.dot` en el Host → probar. Cada build nuevo da
+  un CID nuevo que se vuelve a pegar.
+- Nunca decirle al usuario "pruébalo en localhost dentro de Desktop o de la Polkadot App": no
+  funciona.
 
 ## Reglas del sandbox
 
@@ -24,7 +29,7 @@ cambiar en otras versiones del SDK.
 - El Host API (TrUAPI) es la única salida: red, cadena, almacenamiento y firma pasan por él
   ([Sandbox, docs.polkadot.com](https://docs.polkadot.com/reference/apps/protocol/truapi/sandbox/)).
 - La app recibe una **cuenta derivada por Product**, nunca la cuenta raíz del usuario. La misma
-  persona tiene direcciones distintas en `localhost:5173` y en `mi-app.dot`.
+  persona tiene direcciones distintas en `mi-app.dot` y en `otra-app.dot`.
 - Las peticiones HTTP salientes se limitan a los dominios declarados en el manifest
   ([Permisos de Desktop](https://docs.polkadot.com/reference/apps/hosts/polkadot-desktop/permissions/)).
   El ETH-RPC público se leyó desde el Host en la app de referencia; el detalle de permisos para otros

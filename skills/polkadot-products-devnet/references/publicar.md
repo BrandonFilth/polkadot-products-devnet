@@ -182,6 +182,6 @@ Fuente: pruebas del equipo con la app de referencia. El flujo completo con
 - **Bulletin borra el contenido a los ~14 días.** Volver a publicar el bundle y el icono antes de
   cada demo o evaluación.
 - Mostrar en la app un sello de versión (fecha del build) para saber qué carga el Host.
-- La cuenta del Product depende del dominio: al cambiar de `localhost:5173` a `mi-app.dot` las
+- La cuenta del Product depende del dominio: al cambiar de `mi-app.dot` a otro nombre las
   direcciones cambian. Lo que dependa de `msg.sender` (admins, dueños) se configura desde el dominio
   final.

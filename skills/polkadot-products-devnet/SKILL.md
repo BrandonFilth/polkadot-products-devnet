@@ -103,7 +103,7 @@ algún ✘. Correrlo antes de diagnosticar un problema de instalación.
 1. Contrato en Remix → dirección + ABI (`references/contratos.md`).
 2. Proyecto Vite + TS con las versiones fijas (`references/versiones.md`), verificado con el script.
 3. Conexión, lecturas y escrituras con el SDK (`references/app-sdk.md`).
-4. Parte visual y lecturas con `pnpm dev` (`localhost:5173`). Conexión, firmas y PGAS solo con la
-   app publicada en su `.dot` y abierta desde el Host: la Polkadot App no abre `localhost`
-   (`references/app-sdk.md`, *Dónde probar*).
+4. Parte visual y lecturas con `pnpm dev` en un navegador normal. Conexión, firmas y PGAS solo con
+   la app publicada en su `.dot` y abierta desde el Host: ni Desktop ni la Polkadot App se conectan
+   a `localhost` (`references/app-sdk.md`, *Dónde probar*).
 5. `pnpm build` y publicación (`references/publicar.md`).

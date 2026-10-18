@@ -49,8 +49,8 @@ Formato: **síntoma → causa → solución**. Si un síntoma no está aquí, bu
 | Una firma nunca llega al teléfono | Otra firma sigue pendiente; el Host atiende una a la vez | Esperar a que termine la anterior; no firmar en segundo plano |
 | `timeout` al firmar | El usuario no aprobó a tiempo; la tx pudo entrar | Leer el estado del contrato antes de reintentar |
 | El revert solo aparece al firmar | Se llamó `.tx()` sin simular | Llamar `.query()` antes y mostrar el motivo del revert |
-| "Conectar" o la firma no hacen nada en `localhost` | La Polkadot App no abre `localhost`; la conexión y las firmas necesitan la app publicada | Publicar en tu `.dot` y probar desde ahí (`app-sdk.md`, *Dónde probar*) |
-| Direcciones distintas en `localhost` y en `.dot` | La cuenta del Product se deriva del dominio | Configurar admins y dueños desde el dominio final |
+| "Conectar" o la firma no hacen nada en `localhost` | Ni Desktop ni la Polkadot App se conectan a `localhost`; la conexión y las firmas necesitan la app publicada | Publicar en tu `.dot` y probar desde ahí (`app-sdk.md`, *Dónde probar*) |
+| Direcciones distintas en dos dominios `.dot` | La cuenta del Product se deriva del dominio | Configurar admins y dueños desde el dominio final |
 
 ## Publicación
 
