@@ -13,12 +13,12 @@ cambiar en otras versiones del SDK.
   Conectar la cuenta, firmar, pedir PGAS o guardar algo en el contrato solo se prueba con la app
   **publicada en su dominio `.dot`** y abierta desde el Host. Comprobado por el equipo en octubre
   de 2026 con Desktop 0.1.3 y la Polkadot App del devnet.
-- `pnpm dev` (`localhost:5173`) sirve solo en un navegador normal, para la parte visual y las
-  lecturas por ETH-RPC. Ahí `isInsideContainer()` es `false` y la app debe mostrar que está fuera del
-  Host.
-- Ciclo de trabajo: cambiar → `pnpm build` → publicar (`publicar.md`, sección 2: subir con el *pool*
-  y pegar el CID en el `contenthash`) → abrir `tu-app.dot` en el Host → probar. Cada build nuevo da
-  un CID nuevo que se vuelve a pegar.
+- `pnpm dev` (p. ej. `http://127.0.0.1:5173`) sirve solo en un navegador normal, para la parte
+  visual, el juego y las lecturas por ETH-RPC. Ahí `isInsideContainer()` es `false` y la app debe
+  mostrar que está fuera del Host.
+- Ciclo de trabajo: cambiar → `pnpm build` → publicar (`publicar.md`, sección 2: *pool* + nombre
+  temporal + pegar el CID en el `contenthash`) → abrir `tu-app.dot` en el Host → probar. Cada build
+  nuevo da un CID nuevo que se vuelve a pegar. Es el mismo método de la publicación final.
 - Nunca decirle al usuario "pruébalo en localhost dentro de Desktop o de la Polkadot App": no
   funciona.
 
@@ -36,8 +36,8 @@ cambiar en otras versiones del SDK.
   dominios queda **POR VERIFICAR**.
 - **Una firma a la vez.** El Host atiende las solicitudes en orden; una segunda firma espera detrás
   de la primera. No lanzar firmas en segundo plano.
-- `getProductContext()` no responde en Desktop 0.1.3: si se usa, ponerle timeout (3 s en el Event
-  Tracker) y deducir el id del Product desde la URL.
+- `getProductContext()` no responde en Desktop 0.1.3: si se usa, ponerle timeout (3 s en la app de
+  referencia) y deducir el id del Product desde la URL.
 
 ## Vite
 

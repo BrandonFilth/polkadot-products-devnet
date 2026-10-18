@@ -57,7 +57,7 @@ skills/polkadot-products-devnet/
     versiones.md              versiones fijas y resultado de la última prueba
     contratos.md              Solidity/REVM, Remix + MetaMask, ABI, OpenZeppelin, cuentas
     app-sdk.md                Product SDK: sandbox, createContract, .query() → .tx(), gas
-    publicar.md               pad, dotns, nombres .dot, manifest e icono
+    publicar.md               probar y publicar (pool + contenthash), pad, dotns, manifest e icono
     errores-comunes.md        síntoma → causa → solución
     fuentes.md                registro curado de fuentes
   scripts/

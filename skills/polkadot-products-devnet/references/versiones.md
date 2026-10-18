@@ -39,6 +39,8 @@ Las versiones salen de la app de referencia del equipo.
 - Desde `@parity/product-sdk` 0.36.0 el SDK depende de `polkadot-api` ^3.2.1 (0.35.0 todavía usaba
   ^2.1.6). El cambio coincide con el commit de Parity *"move the SDK to polkadot-api 3"*
   (`3388e40`, 2026-10-13). Los ejemplos de las skills de Parity en `main` siguen esa línea nueva.
+- El aviso de `pad` 0.16.7 sobre la versión 0.20.0 se refiere al paquete
+  `@parity/polkadot-app-deploy`, no probado. No actualizar.
 
 ## Archivos del proyecto
 
@@ -90,3 +92,6 @@ Agregar una dependencia nueva: `pnpm add <paquete>@<versión> --save-exact`.
 3. WebSockets: Asset Hub y Bulletin responden; génesis de Asset Hub igual al del descriptor.
 4. `pnpm dlx --ignore-scripts <paquete>@<versión> --version` para `pad` y `dotns` ✅.
 5. `pnpm view <paquete> version` para la columna «más reciente».
+
+Prueba del 2026-10-18: `pad` 0.16.7 en Windows, subida con el *pool* a un nombre temporal con
+`--no-manifest` (`publicar.md`, sección 2): 3 min 28 s (dos veces), `Verified on-chain`.

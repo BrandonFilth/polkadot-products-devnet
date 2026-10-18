@@ -58,16 +58,20 @@ Formato: **síntoma → causa → solución**. Si un síntoma no está aquí, bu
 |---|---|---|
 | `pad` sube a otra red | Faltó `--env devnet` (por defecto: `paseo-next-v2`) | `--env devnet` o `$env:PAD_ENV = "devnet"` |
 | `pad` pide el binario Kubo | Faltó `--js-merkle` | Agregar `--js-merkle` |
-| `not authorized` al subir con el *pool* | Parte del *pool* tiene la autorización vencida | Repetir el comando |
-| `pad login`: `did not return the product account key within 25s` y luego `Allocation request timed out after 60s` | Fallo conocido del login móvil en Products Devnet (BUG-007): no llegan la cuenta del Product ni los recursos | No usar `pad login`: subir con el *pool* a un nombre desechable y pegar el CID en tu nombre desde `dotns.dot` (`publicar.md`, sección 2) |
+| `pool account N … is not authorized (or its authorization expired)` | Esa cuenta del *pool* venció en Bulletin | Correr otra vez la misma línea `pad`: elige al azar una de las 10 cuentas sin revisar su autorización. La organización mantiene autorizadas las 10 durante el evento |
+| `pad login`: `did not return the product account key within 25s` y luego `Allocation request timed out after 60s` | Fallo conocido del login móvil en Products Devnet (BUG-007): no llegan la cuenta del Product ni los recursos | No usar `pad login`: subir con el *pool* a un nombre temporal y pegar el CID en tu nombre desde `dotns.dot` (`publicar.md`, sección 2) |
+| No aparece `Storage signer: pool fallback (no session)` o pide aprobar en el teléfono | Hay una sesión de `pad` guardada (alguien corrió `pad login`) | `pad logout` y repetir |
 | `Name has 14 trailing digits; DotNS allows exactly 0 or 2 trailing digits` | El nombre termina en números (marca de tiempo) | Convertir los dígitos a letras: `tmpcacgbabiaebjec.dot` (`publicar.md`, sección 2) |
-| `pool account N … is not authorized (or its authorization expired)` | Esa cuenta del *pool* venció en Bulletin | Repetir el mismo comando: toma otra cuenta |
-| `pad` falla por propietario con tu propio nombre | Le pasaste a `pad` el nombre que es de tu teléfono; `pad` firma con su worker | Darle a `pad` un nombre desechable y pegar el CID a mano en el tuyo |
-| `pad` registró un nombre que no es el tuyo | Con el *pool*, el nombre que le pasas queda a nombre de una cuenta compartida | Usar siempre un nombre desechable (`tmp-<fecha>.dot`) y solo copiar el CID |
+| El nombre temporal ya tiene dueño | Otro intento usó el mismo nombre | Generar otro `$tmp` (segunda línea) y repetir |
+| `pad` falla por propietario con tu propio nombre | Le pasaste a `pad` el nombre que es de tu teléfono; `pad` firma con su worker | Nunca pasar a `pad` el nombre del teléfono: darle el nombre temporal y pegar el CID a mano en el tuyo |
+| `pad` registró un nombre que no es el tuyo | Con el *pool*, el nombre que le pasas queda a nombre de una cuenta compartida | Usar siempre un nombre temporal (`tmp` + fecha en letras) y solo copiar el CID |
+| `Previous deploy did not exit cleanly. Continuing.` / `Previous deploy was interrupted` | Quedó marca de un intento anterior | Inofensivo |
+| `A newer version of polkadot-app-deploy is available (0.16.7 → 0.20.0)` | Aviso de `pad` sobre otro paquete | Ignorarlo; no actualizar (versión fija 0.16.7) |
+| `Update and retry? [Y/n]` tras un fallo | Faltó `PAD_UPDATE_CHECK=0` | Responder `n` y usar el atajo de `publicar.md`, sección 2 |
 | No deja cambiar el `contenthash` | La cuenta no es dueña del nombre; la delegación no se respeta | Hacerlo con la cuenta dueña o desde `dotns.dot` → Profile → Edit |
 | Icono en blanco | Icono subido como UnixFS (`bafybei…`) | Subirlo con `pad` (blob crudo blake2b, `bafk2bza…`) |
-| La tarjeta aparece pero la app no abre | Hay `manifest` pero falta `app.<nombre>.dot` con `contenthash` y `executable` | Publicar con `polkadot-app-deploy.config.ts` (`publicar.md`) |
+| La tarjeta aparece pero la app no abre | Hay `manifest` pero falta `app.<nombre>.dot` con `contenthash` y `executable` | Con el método del taller se agregan a mano (**POR VERIFICAR**, `publicar.md`, sección 4) |
 | La app publicada dejó de cargar tras unos días | Bulletin borra el contenido a los ~14 días | Volver a publicar bundle e icono |
 
-Fuentes: app de referencia del equipo, pruebas del equipo (2026-09-23 a 2026-10-03), `pad --help` 0.16.7 y las pruebas
-del 2026-10-15 (`versiones.md`).
+Fuentes: app de referencia del equipo, pruebas del equipo (2026-09-23 a 2026-10-03), `pad --help` 0.16.7, las pruebas
+del 2026-10-15 (`versiones.md`) y las pruebas del 2026-10-18.

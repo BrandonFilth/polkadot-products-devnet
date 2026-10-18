@@ -52,10 +52,13 @@ Todo está ajustado a **Products Devnet** y a las versiones de `references/versi
 - **Simular antes de firmar:** `.query()` antes de cada `.tx()`. Una firma a la vez.
 - **Gas de la app:** PGAS vía `SmartContractAllowance`; el usuario final no necesita PAS.
 - **Vite:** `base: './'`.
-- **Publicar:** `pad` y `dotns` siempre con `--env devnet`; `pad` con `--js-merkle`. No usar
-  `pad login` (BUG-007): subir con el *pool* a un nombre desechable `tmp-<fecha>.dot`, copiar el CID
-  y pegarlo en el `contenthash` del nombre propio desde `dotns.dot` en el Host
-  (`references/publicar.md`, sección 2).
+- **Probar:** ningún Host se conecta a `localhost`. Conexión, firmas y PGAS solo con la app
+  publicada en su `.dot` y abierta desde el Host; `pnpm dev` solo en un navegador normal.
+- **Publicar:** un solo método para probar y para la publicación final: `pad` 0.16.7 sin sesión,
+  desde la carpeta del proyecto, con `--env devnet --js-merkle --no-manifest`, a un nombre temporal
+  sin dígitos (`tmp` + fecha en letras); copiar el CID final y pegarlo en el `contenthash` del nombre
+  propio desde `dotns.dot` en el Host. Sin mnemónico ni keystore; nunca pasar a `pad` el nombre
+  propio (`references/publicar.md`, sección 2).
 - **Secretos:** nunca pedir, leer, escribir ni mostrar mnemónicos, llaves privadas o `.env` con
   secretos. Solo cuentas de testnet.
 
@@ -83,7 +86,7 @@ referencia de la API, pero para este devnet **se ignora**:
 | `references/versiones.md` | Versiones fijas, resultado de la prueba del 2026-10-15, versiones más recientes no probadas |
 | `references/contratos.md` | Solidity/REVM, Remix + MetaMask, ABI, tamaño, OpenZeppelin 5.6.1, cuentas y mapeo de direcciones |
 | `references/app-sdk.md` | Sandbox, Vite, `createContract`, `.query()` → `.tx()`, cuenta del Product, PGAS, lecturas por ETH-RPC |
-| `references/publicar.md` | `pad`, `dotns`, nombres `.dot`, CID, manifest, icono blake2b, subnombre `app.` |
+| `references/publicar.md` | Método único para probar y publicar (pool + contenthash), `pad`, `dotns`, nombres `.dot`, manifest, icono blake2b, subnombre `app.` |
 | `references/errores-comunes.md` | Síntoma → causa → solución |
 | `references/fuentes.md` | Registro curado de fuentes (URL + fijación + qué cubre) |
 
@@ -106,4 +109,6 @@ algún ✘. Correrlo antes de diagnosticar un problema de instalación.
 4. Parte visual y lecturas con `pnpm dev` en un navegador normal. Conexión, firmas y PGAS solo con
    la app publicada en su `.dot` y abierta desde el Host: ni Desktop ni la Polkadot App se conectan
    a `localhost` (`references/app-sdk.md`, *Dónde probar*).
-5. `pnpm build` y publicación (`references/publicar.md`).
+5. `pnpm build` → publicar (`references/publicar.md`, sección 2) → pegar el CID en el
+   `contenthash` → abrir el `.dot` en el Host. Se repite con cada cambio; es también la publicación
+   final.

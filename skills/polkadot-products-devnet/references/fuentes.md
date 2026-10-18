@@ -82,7 +82,7 @@ respondió 403 a peticiones automáticas el 2026-10-15; usar el registro:
 | https://registry.npmjs.org/@parity/product-sdk/0.27.0 | versión 0.27.0 | Metadatos y dependencias del SDK |
 | https://registry.npmjs.org/@parity/product-sdk-descriptors/0.11.0 | versión 0.11.0 | Descriptores (`devnet-asset-hub`) |
 | https://registry.npmjs.org/@parity/truapi/0.13.1 | versión 0.13.1 | Protocolo con el Host |
-| https://registry.npmjs.org/@polkadot-community-foundation/polkadot-app-deploy/0.16.7 | versión 0.16.7 | `pad` |
+| https://registry.npmjs.org/@polkadot-community-foundation/polkadot-app-deploy/0.16.7 | versión 0.16.7 | `pad` (`--help`, `--no-manifest`, variable `PAD_UPDATE_CHECK` en su código) |
 | https://registry.npmjs.org/@polkadot-community-foundation/dotns-cli/0.9.5 | versión 0.9.5 | `dotns` |
 
 ## Skills: formato e instalación
