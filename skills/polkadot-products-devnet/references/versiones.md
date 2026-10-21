@@ -94,4 +94,9 @@ Agregar una dependencia nueva: `pnpm add <paquete>@<versión> --save-exact`.
 5. `pnpm view <paquete> version` para la columna «más reciente».
 
 Prueba del 2026-10-18: `pad` 0.16.7 en Windows, subida con el *pool* a un nombre temporal con
-`--no-manifest` (`publicar.md`, sección 2): 3 min 28 s (dos veces), `Verified on-chain`.
+`--no-manifest` (`publicar.md`, sección 2): 3 min 28 s (dos veces) con un bundle de prueba de unos 21 KB, `Verified on-chain`.
+
+Prueba del 2026-10-21: `pad` 0.16.7 con config + `APP_DOT` (`publicar.md`, sección 2, variante) y
+la muestra del taller con el plugin de Vite (`app-sdk.md`, *Vite*; `dist` 1.85 MB, 39 archivos; CAR
+de 1.87 MB): 3 min 46 s hasta `CID:` y 6 min 01 s en total, exit 0. Antes del plugin (8.95 MB, 69
+archivos) la subida tardaba unos 10 min.

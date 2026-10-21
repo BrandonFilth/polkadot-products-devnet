@@ -51,6 +51,55 @@ export default defineConfig({
 });
 ```
 
+### Bundle sin metadatos de otras cadenas
+
+`@parity/product-sdk-chain-client` importa de forma dinámica los metadatos de todas las cadenas (los
+presets de `getChainAPI`). Suman unos 4-5 MB (previewnet, paseo, kusama, polkadot asset hub…)
+aunque la app solo use devnet. La solución es un plugin de Vite, solo para el build, que cambia
+cada subruta de `@parity/product-sdk-descriptors/*` por un módulo vacío, menos `devnet-asset-hub`:
+
+```js
+// vite.config.js
+import { defineConfig } from 'vite';
+
+const DESCRIPTORES = '@parity/product-sdk-descriptors/';
+const STUB = '\0descriptor-sin-usar:';
+
+// @parity/product-sdk-chain-client importa de forma dinámica los metadatos de todas las cadenas
+// (presets de getChainAPI) aunque el juego solo usa devnet-asset-hub. En el build se cambian los
+// demás descriptores por un módulo vacío para que no terminen en dist.
+// Solo aplica en el build: si el juego llega a importar otra cadena, en pnpm dev y en los tests
+// funciona, pero en dist queda vacía. Agrega su subruta a la condición de resolveId.
+export function soloDescriptorDevnet() {
+  return {
+    name: 'solo-descriptor-devnet',
+    apply: 'build',
+    enforce: 'pre',
+    resolveId(id) {
+      if (!id.startsWith(DESCRIPTORES)) return null;
+      const subruta = id.slice(DESCRIPTORES.length);
+      return subruta === 'devnet-asset-hub' ? null : STUB + subruta;
+    },
+    load(id) {
+      return id.startsWith(STUB) ? 'export {};' : null;
+    },
+  };
+}
+
+export default defineConfig({
+  // Rutas relativas: el bundle se sirve desde un CID de Bulletin, no desde la raíz de un dominio.
+  base: './',
+  plugins: [soloDescriptorDevnet()],
+});
+```
+
+- Resultado en la muestra del taller: `dist` pasa de 8.95 MB / 69 archivos a 1.85 MB / 39 archivos,
+  y publicar pasa de unos 10 min a unos 4 min (`publicar.md`, sección 2).
+- Solo aplica en el build: si la app importa otra cadena, funciona en `pnpm dev` y en los tests,
+  pero queda vacía en `dist`. Agregar su subruta a la condición de `resolveId`.
+
+Fuente: muestra del taller (`polkadot-app-hackaton/game/vite.config.js`), 2026-10-21.
+
 ## Imports (SDK 0.27.0)
 
 ```ts

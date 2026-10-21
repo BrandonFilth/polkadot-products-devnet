@@ -46,7 +46,8 @@ El registro con `dotns register domain` no se repitió el 2026-10-15: **POR VERI
 
 ## 2. Probar y publicar: el método del taller
 
-Es el mismo método para probar durante el desarrollo y para la publicación final. Ningún Host se
+El mismo flujo tiene dos usos: pruebas con `--no-manifest` (pasos de abajo) y la publicación final
+con config + `APP_DOT` (variante, más abajo). Ningún Host se
 conecta a `localhost` (ver `app-sdk.md`, *Dónde probar*): todo lo que pase por el Host se prueba con
 la app publicada en su `.dot`.
 
@@ -79,8 +80,10 @@ la app publicada en su `.dot`.
 
 - Éxito = `Storage signer: pool fallback (no session)`, `Using pool account N`, `Verified on-chain`,
   `DEPLOYMENT COMPLETE!` y la última línea `CID: bafy…` (el *Root CID*). Las líneas `bafkrei…` son
-  los trozos, no el CID de la app. Tarda unos 3.5 min para un bundle chico (3 min 28 s, medido dos
-  veces).
+  los trozos, no el CID de la app. Tarda unos 3.5 min con un bundle de prueba de unos 21 KB (3 min
+  28 s, medido dos veces). El tiempo crece con el bundle: la muestra del taller, de 1.85 MB después
+  del plugin de Vite (`app-sdk.md`, *Vite*), tarda 3 min 46 s hasta el CID; con unos 9 MB, antes
+  del plugin, tardaba unos 10 min.
 - Comprobación sin el Host: `https://<nombre-temporal>.dev-dot.li`.
 
 ### Variante: publicar con icono y manifest (config + `APP_DOT`)
@@ -144,7 +147,9 @@ Por qué cada parte:
 Si falla: `errores-comunes.md`, *Publicación*. La organización autorizó las 10 cuentas del *pool*
 con 1000 transacciones y 1000 MB cada una (unos 10 GB en total).
 
-Bulletin borra el contenido a los ~14 días: volver a publicar antes de demos o evaluación.
+Bulletin borra el contenido a los ~14 días. Volver a publicar el bundle y el icono solo cuando haga
+falta: para renovar el almacenamiento antes de los ~14 días o para una versión nueva. No es una
+rutina.
 
 ### Login móvil de `pad` (BUG-007)
 
@@ -170,7 +175,7 @@ Fuente de esta sección: pruebas del equipo el 2026-10-18 con `pad` 0.16.7 en Wi
 - Si el nombre es de la cuenta del teléfono (el caso del taller): abrir `dotns.dot` dentro del Host
   (Polkadot App o Desktop) → *Profile* → *My Domains* → la fila del nombre → **Resolve**, pegar el
   CID en "IPFS Hash or Gateway URL", *Save* y firmar en el teléfono.
-- Fuera del método del taller, si la cuenta del keystore de `dotns` es **dueña** del nombre:
+- **Solo si la cuenta del keystore de `dotns` es dueña del nombre (no es el método del taller):**
   `dotns content set mi-app-hackaton.dot <CID> --env devnet`.
 - Con `dotns` 0.9.5 y `pad` 0.16.7 **solo el dueño** puede cambiar el `contenthash`; la delegación
   no se respeta.
@@ -231,8 +236,9 @@ fila del nombre:
 
 1. **Resolve** → "Resolve to IPFS" → pegar el CID del bundle (`bafy…`) → *Save* → firmar en el
    teléfono. Es el `contenthash` (sección 3).
-2. **Edit** → *Edit Profile Records* → pestaña *Custom Records* → **Add Record**: clave `manifest`,
-   valor el JSON completo de la línea `Verified text[manifest]:` → guardar → firmar en el teléfono.
+2. **Edit** → se abre *Edit Profile Records* → abajo, en *Custom Records*, **Add Record**: clave
+   (`key`) `manifest`, valor (`value`) el JSON completo de la línea `Verified text[manifest]:` →
+   *Save* → firmar en el teléfono.
 
 Formato del valor (una línea, el que escribe `pad`):
 
@@ -263,8 +269,9 @@ igual al archivo original).
 
 ## 5. Mantenimiento
 
-- **Bulletin borra el contenido a los ~14 días.** Volver a publicar el bundle y el icono antes de
-  cada demo o evaluación.
+- **Bulletin borra el contenido a los ~14 días.** Volver a publicar el bundle y el icono solo
+  cuando haga falta: para renovar el almacenamiento antes de los ~14 días o para una versión nueva.
+  No es una rutina.
 - Mostrar en la app un sello de versión (fecha del build) para saber qué carga el Host.
 - La cuenta del Product depende del dominio: al cambiar de `mi-app.dot` a otro nombre las
   direcciones cambian. Lo que dependa de `msg.sender` (admins, dueños) se configura desde el dominio

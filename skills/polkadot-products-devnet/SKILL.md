@@ -51,18 +51,22 @@ Todo está ajustado a **Products Devnet** y a las versiones de `references/versi
   `getChainAPI()` con Desktop 0.1.3.
 - **Simular antes de firmar:** `.query()` antes de cada `.tx()`. Una firma a la vez.
 - **Gas de la app:** PGAS vía `SmartContractAllowance`; el usuario final no necesita PAS.
-- **Vite:** `base: './'`.
+- **Vite:** `base: './'` y el plugin que deja solo el descriptor del devnet
+  (`references/app-sdk.md`, *Vite*).
 - **Probar:** ningún Host se conecta a `localhost`. Conexión, firmas y PGAS solo con la app
   publicada en su `.dot` y abierta desde el Host; `pnpm dev` solo en un navegador normal.
-- **Publicar:** un solo método para probar y para la publicación final: `pad` 0.16.7 sin sesión,
-  desde la carpeta del proyecto, con `--env devnet --js-merkle --no-manifest`, a un nombre temporal
-  sin dígitos (`tmp` + fecha en letras); copiar el CID final y pegarlo en el `contenthash` del nombre
-  propio desde `dotns.dot` en el Host (Resolve). Para la versión final con icono y manifest, la
-  misma corrida sin `--no-manifest`, con `polkadot-app-deploy.config.mjs`
-  (`domain: process.env.APP_DOT`) y el nombre temporal en `APP_DOT`; luego pegar el CID con Resolve y el JSON
-  de `Verified text[manifest]:` como Custom Record `manifest` del dominio principal, sin `app.`.
-  Sin mnemónico ni keystore; nunca pasar a `pad` el nombre propio (`references/publicar.md`,
-  secciones 2 y 4).
+- **Publicar:** el mismo flujo con dos usos. Parte común: `pad` 0.16.7 sin sesión, desde la
+  carpeta del proyecto, con `--env devnet --js-merkle`, a un nombre temporal sin dígitos (`tmp` +
+  fecha en letras), nunca el nombre propio, sin mnemónico ni keystore.
+  1. **Pruebas rápidas** con `--no-manifest`: copiar el CID y pegarlo con Resolve en `dotns.dot`
+     desde el Host (`contenthash` del nombre propio).
+  2. **Publicación final** con icono, nombre y descripción: `polkadot-app-deploy.config.mjs` en el
+     commit con `domain: process.env.APP_DOT`, sin `--no-manifest`, el nombre temporal en
+     `APP_DOT`; luego el CID con Resolve y el JSON de `Verified text[manifest]:` como Custom Record
+     `manifest` del dominio principal (sin `app.`).
+
+  Volver a publicar solo para renovar el almacenamiento (antes de ~14 días) o para una versión
+  nueva (`references/publicar.md`, secciones 2 y 4).
 - **Secretos:** nunca pedir, leer, escribir ni mostrar mnemónicos, llaves privadas o `.env` con
   secretos. Solo cuentas de testnet.
 
@@ -89,8 +93,8 @@ referencia de la API, pero para este devnet **se ignora**:
 | `references/red-devnet.md` | RPCs, chainId, génesis, Blockscout, Bulletin, faucet, MetaMask, PGAS, descriptor del SDK |
 | `references/versiones.md` | Versiones fijas, resultado de la prueba del 2026-10-15, versiones más recientes no probadas |
 | `references/contratos.md` | Solidity/REVM, Remix + MetaMask, ABI, tamaño, OpenZeppelin 5.6.1, cuentas y mapeo de direcciones |
-| `references/app-sdk.md` | Sandbox, Vite, `createContract`, `.query()` → `.tx()`, cuenta del Product, PGAS, lecturas por ETH-RPC |
-| `references/publicar.md` | Método único para probar y publicar (pool + contenthash), `pad`, `dotns`, nombres `.dot`, config + `APP_DOT`, manifest en Custom Records, icono blake2b, marcadores en Android |
+| `references/app-sdk.md` | Sandbox, Vite, `createContract`, `.query()` → `.tx()`, cuenta del Product, PGAS, lecturas por ETH-RPC, plugin de Vite sin metadatos de otras cadenas |
+| `references/publicar.md` | Dos usos del mismo flujo con `pad`: pruebas con `--no-manifest` y publicación final con config + `APP_DOT` (Resolve + Custom Record `manifest`), nombres `.dot`, `dotns`, icono blake2b, marcadores en Android |
 | `references/errores-comunes.md` | Síntoma → causa → solución |
 | `references/fuentes.md` | Registro curado de fuentes (URL + fijación + qué cubre) |
 
@@ -114,5 +118,5 @@ algún ✘. Correrlo antes de diagnosticar un problema de instalación.
    la app publicada en su `.dot` y abierta desde el Host: ni Desktop ni la Polkadot App se conectan
    a `localhost` (`references/app-sdk.md`, *Dónde probar*).
 5. `pnpm build` → publicar (`references/publicar.md`, sección 2) → pegar el CID en el
-   `contenthash` → abrir el `.dot` en el Host. Se repite con cada cambio; es también la publicación
-   final.
+   `contenthash` → abrir el `.dot` en el Host. Dos usos: pruebas con `--no-manifest`; versión
+   final con config + `APP_DOT`, Resolve y Custom Record `manifest`.
