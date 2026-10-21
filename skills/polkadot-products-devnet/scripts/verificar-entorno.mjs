@@ -58,7 +58,11 @@ const leerJson = (ruta) => {
 {
   const r = correr('pnpm --version');
   const v = r.ok ? r.salida.split(/\r?\n/).pop() : null;
-  if (!v) anotar('mal', 'pnpm', 'no se encontró', `Instala pnpm ${PNPM} y abre una terminal nueva.`);
+  if (!v) {
+    // Cómo instalarlo en cada sistema; el devEngines del proyecto baja después la versión fija.
+    const como = windows ? 'winget install -e --id pnpm.pnpm' : process.platform === 'darwin' ? 'brew install pnpm' : 'curl -fsSL https://get.pnpm.io/install.sh | sh -';
+    anotar('mal', 'pnpm', 'no se encontró', `Instala pnpm con: ${como} y abre una terminal nueva. La versión probada es ${PNPM}.`);
+  }
   else if (v === PNPM) anotar('ok', 'pnpm', v);
   else anotar('ojo', 'pnpm', v, `La versión probada es ${PNPM}. Si el proyecto tiene devEngines, pnpm usará esa.`);
 }
@@ -78,14 +82,21 @@ if (windows) {
 }
 
 {
-  // Ubicaciones conocidas del instalador. En Linux es un AppImage y no se puede detectar.
-  const candidatos = windows
-    ? [join(process.env.LOCALAPPDATA ?? '', 'Programs', 'polkadot-desktop')]
-    : process.platform === 'darwin'
-      ? ['/Applications/Polkadot Desktop.app', join(process.env.HOME ?? '', 'Applications/Polkadot Desktop.app')]
-      : [];
-  if (candidatos.some((p) => existsSync(p))) anotar('ok', 'Polkadot Desktop', 'instalado (versión no detectada; probada: 0.1.3)');
-  else if (candidatos.length) anotar('mal', 'Polkadot Desktop', 'no se encontró', 'Instala Polkadot Desktop 0.1.3 y emparéjalo con tu teléfono.');
+  // Ubicaciones conocidas del instalador. En macOS la app se llama "Polkadot Desktop.app" o
+  // "Polkadot Desktop Dev.app" según la versión: se acepta cualquier "Polkadot Desktop*.app".
+  // En Linux es un AppImage y no se puede detectar.
+  const mac = process.platform === 'darwin';
+  const enMac = () =>
+    ['/Applications', join(process.env.HOME ?? '', 'Applications')].some((carpeta) => {
+      try {
+        return readdirSync(carpeta).some((n) => n.startsWith('Polkadot Desktop') && n.endsWith('.app'));
+      } catch {
+        return false;
+      }
+    });
+  const encontrado = windows ? existsSync(join(process.env.LOCALAPPDATA ?? '', 'Programs', 'polkadot-desktop')) : mac && enMac();
+  if (encontrado) anotar('ok', 'Polkadot Desktop', 'instalado (versión no detectada; probada: 0.1.3)');
+  else if (windows || mac) anotar('mal', 'Polkadot Desktop', 'no se encontró', 'Instala Polkadot Desktop 0.1.3 y emparéjalo con tu teléfono.');
   else anotar('ojo', 'Polkadot Desktop', 'revísalo a mano', 'Abre el AppImage y confirma que está emparejado.');
 }
 
