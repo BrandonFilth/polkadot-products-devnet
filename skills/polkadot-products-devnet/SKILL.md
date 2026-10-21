@@ -57,8 +57,12 @@ Todo está ajustado a **Products Devnet** y a las versiones de `references/versi
 - **Publicar:** un solo método para probar y para la publicación final: `pad` 0.16.7 sin sesión,
   desde la carpeta del proyecto, con `--env devnet --js-merkle --no-manifest`, a un nombre temporal
   sin dígitos (`tmp` + fecha en letras); copiar el CID final y pegarlo en el `contenthash` del nombre
-  propio desde `dotns.dot` en el Host. Sin mnemónico ni keystore; nunca pasar a `pad` el nombre
-  propio (`references/publicar.md`, sección 2).
+  propio desde `dotns.dot` en el Host (Resolve). Para la versión final con icono y manifest, la
+  misma corrida sin `--no-manifest`, con `polkadot-app-deploy.config.mjs`
+  (`domain: process.env.APP_DOT`) y el nombre temporal en `APP_DOT`; luego pegar el CID con Resolve y el JSON
+  de `Verified text[manifest]:` como Custom Record `manifest` del dominio principal, sin `app.`.
+  Sin mnemónico ni keystore; nunca pasar a `pad` el nombre propio (`references/publicar.md`,
+  secciones 2 y 4).
 - **Secretos:** nunca pedir, leer, escribir ni mostrar mnemónicos, llaves privadas o `.env` con
   secretos. Solo cuentas de testnet.
 
@@ -86,7 +90,7 @@ referencia de la API, pero para este devnet **se ignora**:
 | `references/versiones.md` | Versiones fijas, resultado de la prueba del 2026-10-15, versiones más recientes no probadas |
 | `references/contratos.md` | Solidity/REVM, Remix + MetaMask, ABI, tamaño, OpenZeppelin 5.6.1, cuentas y mapeo de direcciones |
 | `references/app-sdk.md` | Sandbox, Vite, `createContract`, `.query()` → `.tx()`, cuenta del Product, PGAS, lecturas por ETH-RPC |
-| `references/publicar.md` | Método único para probar y publicar (pool + contenthash), `pad`, `dotns`, nombres `.dot`, manifest, icono blake2b, subnombre `app.` |
+| `references/publicar.md` | Método único para probar y publicar (pool + contenthash), `pad`, `dotns`, nombres `.dot`, config + `APP_DOT`, manifest en Custom Records, icono blake2b, marcadores en Android |
 | `references/errores-comunes.md` | Síntoma → causa → solución |
 | `references/fuentes.md` | Registro curado de fuentes (URL + fijación + qué cubre) |
 

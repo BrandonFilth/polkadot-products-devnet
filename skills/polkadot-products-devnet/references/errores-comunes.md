@@ -69,9 +69,16 @@ Formato: **síntoma → causa → solución**. Si un síntoma no está aquí, bu
 | `A newer version of polkadot-app-deploy is available (0.16.7 → 0.20.0)` | Aviso de `pad` sobre otro paquete | Ignorarlo; no actualizar (versión fija 0.16.7) |
 | `Update and retry? [Y/n]` tras un fallo | Faltó `PAD_UPDATE_CHECK=0` | Responder `n` y usar el atajo de `publicar.md`, sección 2 |
 | No deja cambiar el `contenthash` | La cuenta no es dueña del nombre; la delegación no se respeta | Hacerlo con la cuenta dueña o desde `dotns.dot` → Profile → Edit |
-| Icono en blanco | Icono subido como UnixFS (`bafybei…`) | Subirlo con `pad` (blob crudo blake2b, `bafk2bza…`) |
-| La tarjeta aparece pero la app no abre | Hay `manifest` pero falta `app.<nombre>.dot` con `contenthash` y `executable` | Con el método del taller se agregan a mano (**POR VERIFICAR**, `publicar.md`, sección 4) |
+| Icono en blanco | `icon.cid` del registro `manifest` es UnixFS (`bafybei…`) | Subirlo con `pad` (blob crudo blake2b, `bafk2bza…`) y copiar el JSON de `Verified text[manifest]:` |
+| La tarjeta aparece pero la app no abre | El dominio principal no tiene `contenthash` (se agregó el registro `manifest` pero no el CID del bundle) | `dotns.dot` → Profile → My Domains → **Resolve** con el CID `bafy…` y firmar. No hace falta `app.` (`publicar.md`, sección 4) |
+| `Error: domain required (e.g. my-app.dot)` | `APP_DOT` no existe en esa terminal; PowerShell no pasa el argumento vacío | Correr la línea de `APP_DOT` y repetir `pad` en la misma terminal |
+| `Error: Invalid product config at …` con `product config domain must be a non-empty dotNS name ending in one of: .dot, .paseo` | Hay `polkadot-app-deploy.config.mjs` con `domain: process.env.APP_DOT` y `APP_DOT` no está definida (se pasó un nombre a mano) | Definir `APP_DOT` y pasar `$env:APP_DOT` (`"$APP_DOT"`) a `pad`. No sube nada antes del error |
+| `Deployment failed (not retryable): Invalid product config …` con `--no-manifest` | `pad` 0.16.7 carga la config después de subir aunque haya `--no-manifest`, y `APP_DOT` no está definida (según el código) | El CID ya subió; definir `APP_DOT` antes de las próximas corridas |
+| `Config domain '…' (in …) does not match deploy domain '…'` | El `<domain>` pasado a `pad` no es el de `APP_DOT` | El bundle subió pero el manifest no se escribió: repetir usando `$env:APP_DOT` como argumento |
+| En Android sale la tarjeta anterior (sin icono o con el manifest viejo) | La Polkadot App para Android no refresca el manifest de una app guardada en marcadores (reportado) | Quitar el marcador, buscar la app otra vez y volver a agregarla |
+| Los acentos del JSON del manifest salen como `r├®cord` | Salida de `pad` capturada por tubería en PowerShell 5.1 | Correr `pad` sin tuberías o corregir los acentos a mano antes de pegar el registro |
 | La app publicada dejó de cargar tras unos días | Bulletin borra el contenido a los ~14 días | Volver a publicar bundle e icono |
 
 Fuentes: app de referencia del equipo, pruebas del equipo (2026-09-23 a 2026-10-03), `pad --help` 0.16.7, las pruebas
-del 2026-10-15 (`versiones.md`) y las pruebas del 2026-10-18.
+del 2026-10-15 (`versiones.md`), las pruebas del 2026-10-18, la corrida con config + `APP_DOT` del
+2026-10-21 y la prueba del organizador con `polka-man.dot`.
