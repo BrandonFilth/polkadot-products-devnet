@@ -36,7 +36,8 @@ $env:DOTNS_ENV = "devnet"
 - Para el hackatón: **nombres de 9 caracteres o más**.
 - El registro es *commit-reveal*: reserva, espera de ~60 s (no está colgado), registro final.
 - Registrar (método del taller): en la Polkadot App o Desktop, `dotns.dot` → Search → Register →
-  Register → Continue → firmar en el teléfono. Comprobado por la organización el 2026-10-21.
+  Register → Continue → firmar en el teléfono. Es el flujo del capítulo 5, sección 8 del tutorial
+  ("Compra tu dominio .dot", con captura).
 - ¿Está libre? `dotns lookup owner-of <etiqueta> --env devnet`.
 - Alternativa por CLI (no es el método del taller): `dotns register domain --name <etiqueta> --env devnet`;
   necesita una cuenta en el keystore de `dotns`. No se repitió el 2026-10-15: **POR VERIFICAR**.
