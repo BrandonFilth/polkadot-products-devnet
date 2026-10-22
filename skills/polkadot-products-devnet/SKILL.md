@@ -21,6 +21,7 @@ Todo está ajustado a **Products Devnet** y a las versiones de `references/versi
 - Publicar la app (`pad`, `dotns`, Bulletin, manifest, icono).
 - Diagnosticar un error del entorno, del SDK, de firmas o de publicación.
 - Revisar si el entorno del usuario tiene lo necesario.
+- Revisar una spec (`SPEC.md`, `spec-*.md`) antes de escribir código.
 
 ## Cómo responder
 
@@ -34,6 +35,11 @@ Todo está ajustado a **Products Devnet** y a las versiones de `references/versi
 6. Si no aparece en ninguna fuente: decir **"no verificado"**, explicar qué habría que probar y no
    inventar APIs, direcciones, versiones ni comandos.
 7. Lo marcado **POR VERIFICAR** en las referencias se presenta como tal, no como hecho.
+8. Si piden revisar una spec: contrastarla con las *Reglas obligatorias* (versiones fijas, red
+   Products Devnet, sandbox de `references/app-sdk.md`, publicación con `pad` de
+   `references/publicar.md`, una firma a la vez y `.query()` antes de `.tx()`). Responder con una
+   lista: qué choca, la referencia que lo respalda y el cambio propuesto a la spec. No escribir
+   código ni editar la spec salvo que lo pidan.
 
 ## Reglas obligatorias
 

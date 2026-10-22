@@ -111,8 +111,9 @@ import { devnet_asset_hub } from '@parity/product-sdk-descriptors/devnet-asset-h
 ```
 
 Comprobado el 2026-10-15: estos imports y el flujo de abajo pasan `tsc --noEmit` (y los imports,
-`vite build`) con las versiones de `versiones.md`. El flujo no se ejecutó dentro de un Host en esa
-fecha: **POR VERIFICAR** en Desktop 0.1.3 y en el teléfono.
+`vite build`) con las versiones de `versiones.md`. El mismo flujo (en
+`polkadot-app-hackaton/game/src/hub/hub.ts`) funcionó dentro del Host el 2026-10-21, en Polkadot
+Desktop 0.1.3 y en la Polkadot App en Android: conectar, permiso de PGAS, firmar y username.
 
 ## Flujo completo
 

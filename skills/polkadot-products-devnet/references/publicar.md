@@ -35,14 +35,14 @@ $env:DOTNS_ENV = "devnet"
 - Etiqueta de 3 a 63 caracteres: `a-z`, `0-9`, `-`; sin guion al inicio ni al final.
 - Para el hackatón: **nombres de 9 caracteres o más**.
 - El registro es *commit-reveal*: reserva, espera de ~60 s (no está colgado), registro final.
+- Registrar (método del taller): en la Polkadot App o Desktop, `dotns.dot` → Search → Register →
+  Register → Continue → firmar en el teléfono. Comprobado por la organización el 2026-10-21.
 - ¿Está libre? `dotns lookup owner-of <etiqueta> --env devnet`.
-- Registrar: `dotns register domain --name <etiqueta> --env devnet`.
-- Para el taller, el nombre se compra en la Polkadot App desde `dotns.dot` (sección 2).
-  `dotns register` necesita una cuenta en el keystore de `dotns` y no es el método del taller.
+- Alternativa por CLI (no es el método del taller): `dotns register domain --name <etiqueta> --env devnet`;
+  necesita una cuenta en el keystore de `dotns`. No se repitió el 2026-10-15: **POR VERIFICAR**.
 
 Fuentes: [Register a .dot domain](https://docs.polkadot.com/apps/register-dot-domain/),
 [PoP rules and pricing](https://docs.polkadot.com/reference/apps/infrastructure/dotns/poprules-pricing/).
-El registro con `dotns register domain` no se repitió el 2026-10-15: **POR VERIFICAR**.
 
 ## 2. Probar y publicar: el método del taller
 

@@ -25,8 +25,8 @@ Las versiones salen de la app de referencia del equipo.
 | `pad` = `@polkadot-community-foundation/polkadot-app-deploy` | 0.16.7 | ✅ `--version` → `polkadot-app-deploy v0.16.7` | 0.16.7 |
 | `dotns` = `@polkadot-community-foundation/dotns-cli` | 0.9.5 | ✅ `--version` → `0.9.5` | 0.10.1 |
 | CLI `skills` (instalar skills) | 1.7.2 | ✅ `add <ruta> --list` y `add … -a kiro-cli/claude-code --copy`; declara Node ≥ 22.20.0 y con 22.18 solo avisa `EBADENGINE` | 1.7.2 |
-| Polkadot Desktop | 0.1.3 | **POR VERIFICAR** hoy (probado por última vez el 2026-10-01) | — |
-| Polkadot App (teléfono) | — | **POR VERIFICAR** (flujos de firma no probados hoy) | — |
+| Polkadot Desktop | 0.1.3 | ✅ 2026-10-21: la muestra del taller (polka-man.dot) conecta la cuenta, pide PGAS, guarda el récord con una firma y cambia el username | — |
+| Polkadot App (teléfono, Android) | — | ✅ 2026-10-21: los mismos flujos con la muestra | — |
 
 ## Por qué estas y no las más nuevas
 
@@ -86,7 +86,9 @@ Agregar una dependencia nueva: `pnpm add <paquete>@<versión> --save-exact`.
 2. Lectura real en el devnet del contrato `Leaderboard` de prueba
    `0xa2625aa8e8790a3322acd045b32f67fba1808542`:
    - Con el SDK desde Node: ❌ `Host provider unavailable for chain 0xd6ee…`. Es lo esperado: el SDK
-     solo funciona dentro de un Host. **La ruta SDK + Host queda POR VERIFICAR** en esta fecha.
+     solo funciona dentro de un Host. La ruta SDK + Host se comprobó después, el 2026-10-21, con
+     la muestra del taller en Polkadot Desktop 0.1.3 y la Polkadot App en Android (conectar, PGAS,
+     firmar, username).
    - Con viem `readContract` por ETH-RPC: ✅ `chainId` 420420417, `playerCount()` = 1,
      `getScores(0,10)` = `[["0x42fb…53e1"], ["prueba_ok"], [1240]]`.
 3. WebSockets: Asset Hub y Bulletin responden; génesis de Asset Hub igual al del descriptor.

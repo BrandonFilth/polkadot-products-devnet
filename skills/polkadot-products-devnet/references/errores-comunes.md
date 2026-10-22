@@ -25,7 +25,7 @@ Formato: **síntoma → causa → solución**. Si un síntoma no está aquí, bu
 | `Host provider unavailable for chain 0x…` | El código corre fuera de un Host (navegador normal o Node) | Abrir la app dentro de Polkadot Desktop o la Polkadot App; para scripts, leer por ETH-RPC con viem |
 | La IA propone `getChainAPI('paseo')` o `paseo_asset_hub` | Ejemplos de las skills de Parity, que apuntan a Paseo Next v2 | Usar `devnet_asset_hub` (`red-devnet.md`) |
 | `readonly … cannot be assigned to the mutable type 'AbiEntry[]'` | ABI escrita como literal `as const` | Importar la ABI como JSON y castear `as AbiEntry[]` |
-| Pantalla en blanco al abrir el `.dot` (síntoma **POR VERIFICAR**) | Vite sin `base: './'`: el bundle pide `/assets/…` desde la raíz y no desde el CID | `base: './'` en `vite.config` y volver a publicar |
+| `verificar-entorno.mjs` marca ✘ en *Vite base* (`no es ./`) | Vite sin `base: './'`: el bundle pide `/assets/…` desde la raíz y no desde el CID | `base: './'` en `vite.config` y volver a publicar |
 
 ## Contratos y Remix
 
