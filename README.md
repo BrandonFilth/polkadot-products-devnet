@@ -74,23 +74,24 @@ node .kiro/skills/polkadot-products-devnet/scripts/verificar-entorno.mjs ruta/de
 La ruta depende del agente: `.kiro/skills/` (Kiro), `.claude/skills/` (Claude Code) o
 `.agents/skills/` (Cursor, Copilot, Codex).
 
-Revisa Node (mínimo 22.19), pnpm 12.6.0, Git, Polkadot Desktop y, si hay un proyecto, las versiones
-exactas del SDK, el override de `@parity/truapi`, `devEngines`, lockfiles de npm/yarn, lo instalado en
-`node_modules` y `base: './'` en Vite.
+Revisa Node (mínimo 22.19), pnpm 12.6.0, Git, Polkadot Desktop y, si hay un proyecto: las versiones
+exactas, que `@parity/truapi` y `polkadot-api` estén instalados una sola vez, los descriptores de PCF,
+los overrides acotados sin globales, `minimumReleaseAgeExclude`, `devEngines`, lockfiles de npm/yarn y
+`base: './'` en Vite.
 
 Es **solo lectura**: no instala nada, no escribe archivos y no hace llamadas de red. Solo ejecuta
 `pnpm --version`, `git --version` y, en Windows, `Get-ExecutionPolicy`.
 
 ## Versiones
 
-Probadas el 2026-10-15: `@parity/product-sdk` 0.27.0, `@parity/product-sdk-descriptors` 0.11.0,
-`@parity/truapi` 0.13.1 (override), pnpm 12.6.0, solc 0.8.28, OpenZeppelin 5.6.1, `pad` 0.16.7,
-`dotns` 0.9.5. Detalle y pendientes en
+Probadas el 2026-10-23: `@parity/product-sdk` 0.39.0, `polkadot-api` 3.2.1, `@parity/truapi` 0.25.0
+(overrides acotados), descriptores de PCF 0.14.0-pcf.1, pnpm 12.6.0, solc 0.8.28, OpenZeppelin 5.6.1,
+`pad` 0.22.1, `dotns` 1.0.0. Detalle y pendientes en
 [`references/versiones.md`](skills/polkadot-products-devnet/references/versiones.md).
 
 ## Créditos
 
-Las skills oficiales de Parity ([paritytech/product-sdk](https://github.com/paritytech/product-sdk/tree/07fed919bc067c7de4605ceb61fd72ed741d6d86/product-sdk/skills),
+Las skills oficiales de Parity ([paritytech/product-sdk](https://github.com/paritytech/product-sdk/tree/941edee26951744174030b3351692cec2a754d53/product-sdk/skills),
 Apache-2.0) se enlazan como referencia fijada a un commit; esta skill no copia su contenido.
 
 ## Licencia

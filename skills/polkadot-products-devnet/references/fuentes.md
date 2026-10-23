@@ -43,20 +43,21 @@ Columnas: **Fijación** = commit, versión o fecha de consulta. Las URLs respond
 
 ## Skills de Parity (Apache-2.0)
 
-Repositorio `paritytech/product-sdk`, carpeta `product-sdk/skills`. Dos fijaciones:
+Repositorio `paritytech/product-sdk`, carpeta `product-sdk/skills`. Una sola fijación:
 
 | URL | Fijación | Qué cubre |
 |---|---|---|
-| https://github.com/paritytech/product-sdk/tree/07fed919bc067c7de4605ceb61fd72ed741d6d86/product-sdk/skills | commit `07fed91` = tag `@parity/product-sdk@0.27.0` (2026-09-03) | **Usar esta.** Corresponde a la versión fija del SDK |
-| https://github.com/paritytech/product-sdk/tree/44a6c0a8578fae3af84263ea83f76b643a8768b7/product-sdk/skills | commit `44a6c0a` (2026-10-13), último cambio de la carpeta al 2026-10-15 | Solo referencia: documenta el SDK nuevo (≥ 0.36, `polkadot-api` 3) |
+| https://github.com/paritytech/product-sdk/tree/941edee26951744174030b3351692cec2a754d53/product-sdk/skills | commit `941edee` | Corresponde al SDK en uso (`@parity/product-sdk` 0.39.0, `polkadot-api` 3) |
 
-Para leerlas, usar estos archivos directos (texto plano, commit `07fed91`), no la vista de carpeta:
+Para leerlas, usar estos archivos directos (texto plano, commit `941edee`), no la vista de carpeta
+(los cuatro respondieron HTTP 200 el 2026-10-23):
 
 | Skill | URL |
 |---|---|
-| `product-sdk-chain-connection` | https://raw.githubusercontent.com/paritytech/product-sdk/07fed919bc067c7de4605ceb61fd72ed741d6d86/product-sdk/skills/product-sdk-chain-connection/SKILL.md |
-| `product-sdk-contracts` | https://raw.githubusercontent.com/paritytech/product-sdk/07fed919bc067c7de4605ceb61fd72ed741d6d86/product-sdk/skills/product-sdk-contracts/SKILL.md |
-| `product-sdk-transactions` | https://raw.githubusercontent.com/paritytech/product-sdk/07fed919bc067c7de4605ceb61fd72ed741d6d86/product-sdk/skills/product-sdk-transactions/SKILL.md |
+| `product-sdk-chain-connection` | https://raw.githubusercontent.com/paritytech/product-sdk/941edee26951744174030b3351692cec2a754d53/product-sdk/skills/product-sdk-chain-connection/SKILL.md |
+| `product-sdk-contracts` | https://raw.githubusercontent.com/paritytech/product-sdk/941edee26951744174030b3351692cec2a754d53/product-sdk/skills/product-sdk-contracts/SKILL.md |
+| `product-sdk-transactions` | https://raw.githubusercontent.com/paritytech/product-sdk/941edee26951744174030b3351692cec2a754d53/product-sdk/skills/product-sdk-transactions/SKILL.md |
+| `product-sdk-transactions`, API del firmante | https://raw.githubusercontent.com/paritytech/product-sdk/941edee26951744174030b3351692cec2a754d53/product-sdk/skills/product-sdk-transactions/references/signer-api.md |
 
 Antes de aplicar algo de ellas, revisar la sección *Qué ignorar de las skills de Parity* en
 `SKILL.md`.
@@ -75,15 +76,30 @@ Antes de aplicar algo de ellas, revisar la sección *Qué ignorar de las skills 
 ## Paquetes npm
 
 Para consultar metadatos de una versión fija: `pnpm view <paquete>@<versión>`. La web de npmjs.com
-respondió 403 a peticiones automáticas el 2026-10-15; usar el registro:
+respondió 403 a peticiones automáticas el 2026-10-15; usar el registro (los seis respondieron HTTP 200
+el 2026-10-23):
 
 | URL | Fijación | Qué cubre |
 |---|---|---|
-| https://registry.npmjs.org/@parity/product-sdk/0.27.0 | versión 0.27.0 | Metadatos y dependencias del SDK |
-| https://registry.npmjs.org/@parity/product-sdk-descriptors/0.11.0 | versión 0.11.0 | Descriptores (`devnet-asset-hub`) |
-| https://registry.npmjs.org/@parity/truapi/0.13.1 | versión 0.13.1 | Protocolo con el Host |
-| https://registry.npmjs.org/@polkadot-community-foundation/polkadot-app-deploy/0.16.7 | versión 0.16.7 | `pad` (`--help`, `--no-manifest`, variable `PAD_UPDATE_CHECK` en su código) |
-| https://registry.npmjs.org/@polkadot-community-foundation/dotns-cli/0.9.5 | versión 0.9.5 | `dotns` |
+| https://registry.npmjs.org/@parity/product-sdk/0.39.0 | versión 0.39.0 | Metadatos y dependencias del SDK |
+| https://registry.npmjs.org/polkadot-api/3.2.1 | versión 3.2.1 | `polkadot-api` |
+| https://registry.npmjs.org/@parity/truapi/0.25.0 | versión 0.25.0 | Protocolo con el Host (codec 3) |
+| https://registry.npmjs.org/@polkadot-community-foundation/product-sdk-descriptors/0.14.0-pcf.1 | versión 0.14.0-pcf.1 | Descriptores del devnet (`devnet-asset-hub`) |
+| https://registry.npmjs.org/@polkadot-community-foundation/polkadot-app-deploy/0.22.1 | versión 0.22.1 | `pad` (`--help`, `--no-manifest`, variable `PAD_UPDATE_CHECK` en su código) |
+| https://registry.npmjs.org/@polkadot-community-foundation/dotns-cli/1.0.0 | versión 1.0.0 | `dotns` |
+
+## Hosts del devnet
+
+Instalar la versión de devnet más reciente de cada uno. Los enlaces respondieron HTTP 200 el 2026-10-23.
+
+| Host | URL | Notas |
+|---|---|---|
+| Polkadot App para iOS | https://testflight.apple.com/join/HnBX59vz | TestFlight |
+| Polkadot App para Android | https://appdistribution.firebase.dev/i/f3b79521380b40b9 | Grupo de testers |
+| Polkadot App para Android (APK) | https://github.com/Polkadot-Community-Foundation/polkadot-android-community/releases/tag/devnet/2026-10-22.1 | `app-polkadot-devnet.apk`; sin servicios de Google: `app-polkadot-devnet-nogms.apk` |
+| Polkadot Desktop | https://github.com/Polkadot-Community-Foundation/polkadot-desktop-community/releases/latest | `polkadot-desktop-<versión>-x64.exe`, `-arm64.dmg`, `-x64.dmg`, `-x86_64.AppImage`. En macOS se llama **Polkadot Desktop Dev** y no está firmada: clic derecho → Abrir |
+
+Fallas del devnet: https://github.com/Polkadot-Community-Foundation/products-devnet-issues
 
 ## Skills: formato e instalación
 
@@ -99,5 +115,5 @@ Lo que no sale de una URL de este registro viene de pruebas del equipo de Polkad
 (app de referencia y material del bootcamp, septiembre–octubre 2026) y ya está resumido en
 `references/`, con fecha y marca **POR VERIFICAR** donde no se repitió.
 
-Contrato de prueba en el devnet: `Leaderboard` en `0xa2625aa8e8790a3322acd045b32f67fba1808542`
-(Blockscout: https://blockscout-testnet.polkadot.io/address/0xa2625aa8e8790a3322acd045b32f67fba1808542).
+Contrato de prueba en el devnet: `Leaderboard` en `0x0aAf511a454c6A522b37210ca6931Cde1c400Ac9`
+(Blockscout: https://blockscout-testnet.polkadot.io/address/0x0aAf511a454c6A522b37210ca6931Cde1c400Ac9).

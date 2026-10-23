@@ -9,16 +9,22 @@
 import { spawnSync } from 'node:child_process';
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join, resolve } from 'node:path';
+import { dirname, join, resolve } from 'node:path';
 
 // Versiones probadas (ver references/versiones.md).
 const NODE_MIN = [22, 19, 0];
 const PNPM = '12.6.0';
 const FIJAS = {
-  '@parity/product-sdk': '0.27.0',
-  '@parity/product-sdk-descriptors': '0.11.0',
+  '@parity/product-sdk': '0.39.0',
+  'polkadot-api': '3.2.1',
+  '@parity/product-sdk-descriptors': 'npm:@polkadot-community-foundation/product-sdk-descriptors@0.14.0-pcf.1',
 };
-const TRUAPI = '0.13.1';
+const TRUAPI = '0.25.0';
+const POLKADOT_API = '3.2.1';
+// Paquete real detrás del alias @parity/product-sdk-descriptors.
+const PCF = { name: '@polkadot-community-foundation/product-sdk-descriptors', version: '0.14.0-pcf.1' };
+// Dependencias que solo se fijan con overrides acotados (padre@versión>hijo), nunca globales.
+const SIN_GLOBAL = ['@parity/truapi', 'polkadot-api', '@parity/product-sdk-descriptors'];
 
 const proyecto = resolve(process.argv[2] ?? process.cwd());
 const windows = process.platform === 'win32';
@@ -46,6 +52,22 @@ const leerJson = (ruta) => {
     return null;
   }
 };
+// Primera carpeta, desde `desde` hacia arriba, que contiene `relativa`. Sirve para un paquete dentro de
+// un workspace de pnpm: pnpm-workspace.yaml y node_modules/.pnpm están en la raíz del workspace.
+const buscarArriba = (desde, relativa) => {
+  for (let carpeta = desde; ; carpeta = dirname(carpeta)) {
+    if (existsSync(join(carpeta, relativa))) return join(carpeta, relativa);
+    if (dirname(carpeta) === carpeta) return null;
+  }
+};
+// Líneas indentadas de un bloque de primer nivel del YAML (`nombre:`), sin comentarios.
+const bloqueYaml = (lineas, nombre) => {
+  const inicio = lineas.findIndex((l) => l.trimEnd() === `${nombre}:`);
+  if (inicio < 0) return [];
+  const fin = lineas.findIndex((l, i) => i > inicio && l.trim() !== '' && !/^\s/.test(l) && !l.startsWith('#'));
+  return lineas.slice(inicio + 1, fin < 0 ? undefined : fin).filter((l) => /^\s/.test(l) && l.trim() !== '' && !l.trim().startsWith('#'));
+};
+const sinComillas = (texto) => texto.trim().replace(/^['"]|['"]$/g, '');
 
 // ---------------------------------------------------------------- computadora
 
@@ -95,8 +117,8 @@ if (windows) {
       }
     });
   const encontrado = windows ? existsSync(join(process.env.LOCALAPPDATA ?? '', 'Programs', 'polkadot-desktop')) : mac && enMac();
-  if (encontrado) anotar('ok', 'Polkadot Desktop', 'instalado (versión no detectada; probada: 0.1.3)');
-  else if (windows || mac) anotar('mal', 'Polkadot Desktop', 'no se encontró', 'Instala Polkadot Desktop 0.1.3 y emparéjalo con tu teléfono.');
+  if (encontrado) anotar('ok', 'Polkadot Desktop', 'instalado (usa la versión de devnet más reciente)');
+  else if (windows || mac) anotar('mal', 'Polkadot Desktop', 'no se encontró', 'Instala Polkadot Desktop (último release de devnet) y emparéjalo con tu teléfono.');
   else anotar('ojo', 'Polkadot Desktop', 'revísalo a mano', 'Abre el AppImage y confirma que está emparejado.');
 }
 
@@ -125,11 +147,30 @@ if (!pkg) {
   if (motor?.name === 'pnpm' && motor.version === PNPM) anotar('ok', 'devEngines', `pnpm ${PNPM}`);
   else anotar('ojo', 'devEngines', motor ? `${motor.name} ${motor.version}` : 'sin definir', `Agrega devEngines.packageManager con pnpm ${PNPM}.`);
 
-  // Override de @parity/truapi en pnpm-workspace.yaml.
-  const ws = join(proyecto, 'pnpm-workspace.yaml');
-  const yaml = existsSync(ws) ? readFileSync(ws, 'utf8') : '';
-  if (new RegExp(`['"]?@parity/truapi['"]?\\s*:\\s*['"]?${TRUAPI.replaceAll('.', '\\.')}`).test(yaml)) anotar('ok', 'Override de truapi', TRUAPI);
-  else anotar('mal', 'Override de truapi', 'falta', `En pnpm-workspace.yaml: overrides: { '@parity/truapi': ${TRUAPI} }`);
+  // pnpm-workspace.yaml (en el proyecto o en la raíz del workspace): overrides acotados
+  // (padre@versión>hijo) y la excepción de los descriptores en minimumReleaseAgeExclude.
+  const ws = buscarArriba(proyecto, 'pnpm-workspace.yaml');
+  if (!ws) {
+    anotar('mal', 'pnpm-workspace.yaml', 'no existe', 'Copia el pnpm-workspace.yaml de references/versiones.md (overrides acotados y minimumReleaseAgeExclude).');
+  } else {
+    const lineas = readFileSync(ws, 'utf8').replace(/^\uFEFF/, '').split(/\r?\n/);
+    const donde = dirname(ws) === proyecto ? '' : ` (${ws})`;
+    const overrides = bloqueYaml(lineas, 'overrides')
+      .map((l) => l.trim().match(/^(['"]?)(.+?)\1\s*:\s*(.*)$/))
+      .filter(Boolean)
+      .map((m) => ({ clave: m[2], valor: sinComillas(m[3]) }));
+    const globales = overrides.filter((o) => SIN_GLOBAL.includes(o.clave));
+    for (const o of globales) {
+      anotar('mal', 'Overrides', `override global de ${o.clave}${donde}`, 'Usa solo overrides acotados (padre@versión>hijo): los globales rompen pnpm dlx de pad dentro del repo.');
+    }
+    const truapi = overrides.some((o) => o.clave.endsWith('>@parity/truapi') && o.valor === TRUAPI);
+    if (!globales.length && truapi) anotar('ok', 'Overrides acotados', `@parity/truapi ${TRUAPI}${donde}`);
+    else if (!globales.length) anotar('mal', 'Overrides acotados', `sin override de @parity/truapi ${TRUAPI}${donde}`, 'Copia el bloque overrides de references/versiones.md.');
+
+    const excluidos = bloqueYaml(lineas, 'minimumReleaseAgeExclude').map((l) => sinComillas(l.trim().replace(/^-\s*/, '')));
+    if (excluidos.includes(`${PCF.name}@${PCF.version}`)) anotar('ok', 'minimumReleaseAgeExclude', `${PCF.name}@${PCF.version}`);
+    else anotar('mal', 'minimumReleaseAgeExclude', `sin ${PCF.name}@${PCF.version}${donde}`, 'Sin esto pnpm install se bloquea con los descriptores del devnet (references/versiones.md).');
+  }
 
   // Otros gestores de paquetes.
   for (const archivo of ['package-lock.json', 'yarn.lock', 'bun.lockb']) {
@@ -141,23 +182,42 @@ if (!pkg) {
   if (!existsSync(modulos)) {
     anotar('ojo', 'node_modules', 'sin instalar', 'Corre pnpm install.');
   } else {
-    const revisar = (nombre, fija, vs) => {
-      if (!vs.length) return;
-      if (vs.length === 1 && vs[0] === fija) anotar('ok', `${nombre} (instalado)`, fija);
-      else anotar('mal', `${nombre} (instalado)`, vs.join(', '), `Debe ser solo ${fija}. Revisa package.json y el override, y corre pnpm install.`);
-    };
-    // Dependencias directas: su package.json dentro de node_modules.
+    const arreglo = 'Usa las versiones y los overrides de references/versiones.md y corre pnpm install.';
+    // Dependencias directas: su package.json dentro de node_modules. Los descriptores son un alias:
+    // se compara el paquete real (name y version), no el texto del alias.
     for (const [nombre, fija] of Object.entries(FIJAS)) {
-      const v = leerJson(join(modulos, nombre, 'package.json'))?.version;
-      revisar(nombre, fija, v ? [v] : []);
+      const instalado = leerJson(join(modulos, nombre, 'package.json'));
+      if (!instalado) continue;
+      const esperado = nombre === '@parity/product-sdk-descriptors' ? PCF : { name: nombre, version: fija };
+      const real = instalado.name === nombre ? instalado.version : `${instalado.name}@${instalado.version}`;
+      if (instalado.name === esperado.name && instalado.version === esperado.version) anotar('ok', `${nombre} (instalado)`, real);
+      else anotar('mal', `${nombre} (instalado)`, real, `Debe ser ${esperado.name}@${esperado.version}. ${arreglo}`);
     }
-    // truapi es transitiva: pnpm la guarda como node_modules/.pnpm/@parity+truapi@<versión>.
-    const virtual = join(modulos, '.pnpm');
-    const prefijo = '@parity+truapi@';
-    const truapi = existsSync(virtual)
-      ? [...new Set(readdirSync(virtual).filter((c) => c.startsWith(prefijo)).map((c) => c.slice(prefijo.length).split('_')[0]))]
-      : [];
-    revisar('@parity/truapi', TRUAPI, truapi);
+    // Copias en node_modules/.pnpm (en el proyecto o en la raíz del workspace). Cada carpeta de .pnpm
+    // tiene su propio node_modules con el paquete y enlaces a sus dependencias. Se lee el package.json
+    // de cada paquete buscado (name y version reales): el nombre de la carpeta no sirve porque pnpm lo
+    // acorta con un hash cuando es largo (pasa con el paquete de PCF en Windows).
+    const virtual = buscarArriba(proyecto, join('node_modules', '.pnpm'));
+    if (virtual) {
+      const carpetas = readdirSync(virtual);
+      const copias = (nombre) => {
+        const vistas = new Set();
+        for (const c of carpetas) {
+          const p = leerJson(join(virtual, c, 'node_modules', ...nombre.split('/'), 'package.json'));
+          if (p?.name && p.version) vistas.add(`${p.name}@${p.version}`);
+        }
+        return [...vistas].sort();
+      };
+      const unica = (titulo, vistas, esperada, motivo) => {
+        if (vistas.length === 1 && vistas[0] === esperada) anotar('ok', `${titulo} (copias en .pnpm)`, esperada);
+        else anotar('mal', `${titulo} (copias en .pnpm)`, vistas.length ? vistas.join(', ') : 'ninguna', `Debe ser solo ${esperada}${motivo}. ${arreglo}`);
+      };
+      unica('@parity/truapi', copias('@parity/truapi'), `@parity/truapi@${TRUAPI}`, ', la versión de TrUAPI de los Hosts');
+      unica('polkadot-api', copias('polkadot-api'), `polkadot-api@${POLKADOT_API}`, '');
+      // Los descriptores solo deben venir del paquete de PCF: ninguna copia de @parity/product-sdk-descriptors.
+      const descriptores = [...new Set([...copias('@parity/product-sdk-descriptors'), ...copias(PCF.name)])].sort();
+      unica('Descriptores', descriptores, `${PCF.name}@${PCF.version}`, '');
+    }
   }
 
   // Vite: rutas relativas para servir el bundle desde un CID de Bulletin.

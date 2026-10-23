@@ -4,7 +4,7 @@ description: Guía para crear, conectar y publicar Polkadot Products en Products
 metadata:
   autor: BrandonFilth
   evento: Polkadot México – Bootcamp + Hackathon UANL, 29–31 oct 2026
-  probada: "2026-10-15"
+  probada: "2026-10-23"
 ---
 
 # Polkadot Products en Products Devnet
@@ -46,22 +46,25 @@ Todo está ajustado a **Products Devnet** y a las versiones de `references/versi
 - **Red:** Products Devnet. Asset Hub 1000, chainId `420420417`, descriptor `devnet_asset_hub`
   (`@parity/product-sdk-descriptors/devnet-asset-hub`). Nunca `paseo`, `paseo_asset_hub`, Paseo Next
   v2 ni la red "Paseo PassetHub (420420422)".
-- **Versiones exactas** de `references/versiones.md`, sin `^` ni `~`: `@parity/product-sdk` 0.27.0,
-  `@parity/product-sdk-descriptors` 0.11.0, override `@parity/truapi` 0.13.1, pnpm 12.6.0. No
-  actualizar ninguna sin que el usuario lo pida y lo pruebe en el Host.
+- **Versiones exactas** de `references/versiones.md`, sin `^` ni `~`: `@parity/product-sdk` 0.39.0,
+  `polkadot-api` 3.2.1, `@parity/product-sdk-descriptors` como alias
+  `npm:@polkadot-community-foundation/product-sdk-descriptors@0.14.0-pcf.1`, `@parity/truapi` 0.25.0
+  con overrides acotados (`padre@versión>hijo`) y `minimumReleaseAgeExclude` del paquete de PCF,
+  pnpm 12.6.0. Nunca overrides globales: rompen `pnpm dlx` de pad. No actualizar ninguna sin que el
+  usuario lo pida y lo pruebe en el Host.
 - **Solo pnpm.** `pnpm install`, `pnpm add <pkg>@<versión> --save-exact`,
   `pnpm dlx --ignore-scripts <cli>@<versión>`. Nunca npm ni yarn para instalar en el proyecto.
 - **Contratos:** Solidity `pragma solidity 0.8.28;`, sin optimizador, desplegados con Remix +
   MetaMask (REVM). Límite de 24,576 bytes. OpenZeppelin 5.6.1 para tokens y permisos.
 - **SDK:** conectar con `createChainClient({ chains: { assetHub: devnet_asset_hub } })`; no usar
-  `getChainAPI()` con Desktop 0.1.3.
+  `getChainAPI()`. En `.tx()`, `waitFor: 'finalized'` (o `'best-block'`).
 - **Simular antes de firmar:** `.query()` antes de cada `.tx()`. Una firma a la vez.
 - **Gas de la app:** PGAS vía `SmartContractAllowance`; el usuario final no necesita PAS.
 - **Vite:** `base: './'` y el plugin que deja solo el descriptor del devnet
   (`references/app-sdk.md`, *Vite*).
 - **Probar:** ningún Host se conecta a `localhost`. Conexión, firmas y PGAS solo con la app
   publicada en su `.dot` y abierta desde el Host; `pnpm dev` solo en un navegador normal.
-- **Publicar:** el mismo flujo con dos usos. Parte común: `pad` 0.16.7 sin sesión, desde la
+- **Publicar:** el mismo flujo con dos usos. Parte común: `pad` 0.22.1 sin sesión, desde la
   carpeta del proyecto, con `--env devnet --js-merkle`, a un nombre temporal sin dígitos (`tmp` +
   fecha en letras), nunca el nombre propio, sin mnemónico ni keystore.
   1. **Pruebas rápidas** con `--no-manifest`: copiar el CID y pegarlo con Resolve en `dotns.dot`
@@ -78,26 +81,26 @@ Todo está ajustado a **Products Devnet** y a las versiones de `references/versi
 
 ## Qué ignorar de las skills de Parity
 
-Las skills oficiales (`paritytech/product-sdk`, carpeta `product-sdk/skills`, Apache-2.0) son buena
-referencia de la API, pero para este devnet **se ignora**:
+Las skills oficiales (`paritytech/product-sdk`, carpeta `product-sdk/skills`, Apache-2.0), fijadas en
+el commit `941edee` (enlaces en `references/fuentes.md`), corresponden al SDK en uso. Para este
+devnet solo **se ignora** lo propio de otras redes:
 
 1. **Sus ejemplos de red:** usan `getChainAPI("paseo")` y `paseo_asset_hub`, que apuntan a Paseo Next
    v2. Aquí se usa `devnet_asset_hub`.
-2. **"Los contratos compilan a PolkaVM; no uses tooling de Ethereum"** (también en el *setup prompt*
-   oficial). Aquí los contratos son Solidity en REVM con Remix + MetaMask. No usar `resolc`, `cdm`,
-   `cdm.json` ni `ContractManager`; se usa `createContract(runtime, dirección, abi)`.
+2. **PolkaVM, `resolc`, `cdm`, `cdm.json` y `ContractManager`** ("los contratos compilan a PolkaVM; no
+   uses tooling de Ethereum", también en el *setup prompt* oficial). Aquí los contratos son Solidity
+   en REVM con Remix + MetaMask y se usa `createContract(runtime, dirección, abi)`.
 3. **Cualquier preset o entorno que no sea devnet:** `paseo`, `polkadot`, `kusama`, `previewnet`.
-4. **APIs del SDK nuevo:** la rama `main` documenta el SDK ≥ 0.36 sobre `polkadot-api` 3. Consultar la
-   versión fijada al tag `@parity/product-sdk@0.27.0` (commit `07fed91`, enlace en
-   `references/fuentes.md`). Si una firma de función difiere, gana `references/app-sdk.md`.
-5. **`npm init` / `npm install`** de `product-sdk-app-builder`: usar pnpm.
+4. **`npm init` / `npm install`** de `product-sdk-app-builder`: usar pnpm.
+
+Si una firma de función difiere, gana `references/app-sdk.md`.
 
 ## Índice de referencias
 
 | Archivo | Contenido |
 |---|---|
 | `references/red-devnet.md` | RPCs, chainId, génesis, Blockscout, Bulletin, faucet, MetaMask, PGAS, descriptor del SDK |
-| `references/versiones.md` | Versiones fijas, resultado de la prueba del 2026-10-15, versiones más recientes no probadas |
+| `references/versiones.md` | Versiones fijas y resultado de la prueba del 2026-10-23 |
 | `references/contratos.md` | Solidity/REVM, Remix + MetaMask, ABI, tamaño, OpenZeppelin 5.6.1, cuentas y mapeo de direcciones |
 | `references/app-sdk.md` | Sandbox, Vite, `createContract`, `.query()` → `.tx()`, cuenta del Product, PGAS, lecturas por ETH-RPC, plugin de Vite sin metadatos de otras cadenas |
 | `references/publicar.md` | Dos usos del mismo flujo con `pad`: pruebas con `--no-manifest` y publicación final con config + `APP_DOT` (Resolve + Custom Record `manifest`), nombres `.dot`, `dotns`, icono blake2b, marcadores en Android |
@@ -111,9 +114,12 @@ node <carpeta-de-la-skill>/scripts/verificar-entorno.mjs [ruta/del/proyecto]
 ```
 
 Solo lee: no instala, no escribe y no usa la red. Revisa Node ≥ 22.19, pnpm, Git, Polkadot Desktop
-y, si hay `package.json`, las versiones exactas, el override de truapi, `devEngines`, lockfiles de
-otros gestores, lo instalado en `node_modules` y `base: './'` de Vite. Sale con código 1 si hay
-algún ✘. Correrlo antes de diagnosticar un problema de instalación.
+y, si hay `package.json`: las versiones exactas, que `@parity/truapi` (0.25.0) y `polkadot-api`
+(3.2.1) estén instalados una sola vez, los descriptores de PCF, los overrides acotados sin globales,
+`minimumReleaseAgeExclude`, `devEngines`, lockfiles de otros gestores y `base: './'` de Vite. Busca
+`pnpm-workspace.yaml` y `node_modules/.pnpm` en la carpeta del proyecto y en las de arriba (sirve
+para un paquete dentro de un workspace). Sale con código 1 si hay algún ✘. Correrlo antes de
+diagnosticar un problema de instalación.
 
 ## Flujo típico de una app
 

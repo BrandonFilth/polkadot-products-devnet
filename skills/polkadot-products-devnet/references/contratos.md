@@ -51,8 +51,9 @@ armar cada llamada (`createContract(runtime, dirección, abi)` o viem `readContr
 
 - Guardarla como archivo, p. ej. `src/contract/miContrato.abi.json`, y no editarla a mano.
 - Cada vez que cambia el contrato y se vuelve a desplegar: nueva dirección **y** nueva ABI.
-- Con el SDK 0.27.0 la ABI se tipa como `AbiEntry[]` (un arreglo mutable). Un literal `as const` no
-  compila (`readonly … cannot be assigned to the mutable type 'AbiEntry[]'`, comprobado):
+- Con el SDK 0.39.0 la ABI se tipa como `AbiEntry[]` (un arreglo mutable). Un literal `as const` no
+  compila (`readonly … cannot be assigned to the mutable type 'AbiEntry[]'`, comprobado con `tsc` el
+  2026-10-23). La ABI importada como JSON y casteada `as AbiEntry[]` sí compila (mismo día):
 
 ```ts
 import type { AbiEntry } from '@parity/product-sdk/contracts';

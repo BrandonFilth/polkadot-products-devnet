@@ -5,11 +5,12 @@ testnet pública Paseo. En el SDK se llama `devnet`. **No es** el entorno `paseo
 a Paseo Next v2 (`*-next-*.polkadot.io`), una red distinta.
 
 Fuente: skill `product-sdk-chain-connection` de Parity, sección *Environment Support*
-([commit 07fed91](https://github.com/paritytech/product-sdk/blob/07fed919bc067c7de4605ceb61fd72ed741d6d86/product-sdk/skills/product-sdk-chain-connection/SKILL.md)).
+([commit 941edee](https://github.com/paritytech/product-sdk/blob/941edee26951744174030b3351692cec2a754d53/product-sdk/skills/product-sdk-chain-connection/SKILL.md)).
 
 ## Datos de la red
 
-Comprobados el 2026-10-15 (ver `versiones.md`, sección *Cómo se probó*, paso 3).
+Comprobados por el equipo el 2026-10-15 (WebSockets y génesis). El ETH-RPC y el chainId se repitieron
+el 2026-10-23 con `test:red` de la muestra (ver `versiones.md`, sección *Cómo se probó*, paso 3).
 
 | Dato | Valor |
 |---|---|
@@ -44,14 +45,15 @@ Red agregada a mano (Remix no la trae en su lista):
 ## SDK: cómo se conecta una app
 
 - Descriptor de Asset Hub: `devnet_asset_hub`, importado desde
-  `@parity/product-sdk-descriptors/devnet-asset-hub` (subruta, nunca el paquete raíz).
+  `@parity/product-sdk-descriptors/devnet-asset-hub` (subruta, nunca el paquete raíz). En el
+  `package.json`, `@parity/product-sdk-descriptors` es el alias del paquete de Polkadot Community
+  Foundation `0.14.0-pcf.1`, que corresponde al runtime actual de Asset Hub del devnet (`versiones.md`).
 - Conexión: `createChainClient({ chains: { assetHub: devnet_asset_hub } })` desde
   `@parity/product-sdk/chain`. Es el patrón de la app de referencia del equipo.
-- **No usar `getChainAPI()`** con Polkadot Desktop 0.1.3: su llamada de descubrimiento choca con otro
-  método del Host (pruebas del equipo). El preset `getChainAPI('devnet')`
-  existe en el SDK, pero no se ha probado en Desktop 0.1.3: **POR VERIFICAR**.
+- **No usar `getChainAPI()`**: el patrón probado es `createChainClient` con `devnet_asset_hub`. El
+  preset `getChainAPI('devnet')` existe en el SDK pero no se probó: **POR VERIFICAR**.
 - El Host elige el RPC. El SDK **no tiene transporte propio**: fuera de un Host falla con
-  `Host provider unavailable for chain 0xd6ee…` (comprobado en Node, ver `versiones.md`).
+  `Host provider unavailable for chain 0xd6ee…` (comprobado en Node por el equipo).
 - Lecturas sin Host: ETH-RPC con viem (`readContract`) contra `https://eth-rpc-testnet.polkadot.io`.
   Responde con CORS abierto (comprobado en la app de referencia).
 

@@ -20,8 +20,10 @@ Formato: **síntoma → causa → solución**. Si un síntoma no está aquí, bu
 
 | Síntoma | Causa | Solución |
 |---|---|---|
-| En el log del Desktop, pares `Transport error` + `unsupported frame (0, 0)` sin parar | La app usa `@parity/product-sdk` ≥ 0.28 o `@parity/truapi` ≥ 0.16, que Desktop 0.1.3 no entiende | Fijar SDK 0.27.0, descriptors 0.11.0 y el override de truapi 0.13.1 (`versiones.md`). Cerrar la pestaña del Product |
-| La app se queda esperando al conectar en Desktop | `getChainAPI()` o `getProductContext()` sin respuesta en Desktop 0.1.3 | Usar `createChainClient` con `devnet_asset_hub`; poner timeout a `getProductContext()` |
+| Carga y juega pero no conecta la cuenta | La app usa otra versión de TrUAPI que el Host | Usar las versiones y los overrides de `versiones.md`, correr `pnpm install` y `pnpm build` y volver a publicar. Confirmar que el Host es la versión de devnet más reciente |
+| La app se queda esperando al conectar | `getChainAPI()` o `getProductContext()` sin respuesta | Usar `createChainClient` con `devnet_asset_hub`; poner timeout a `getProductContext()` |
+| `pnpm dlx` de `pad` falla con `ERR_PACKAGE_PATH_NOT_EXPORTED … './signer'` | Overrides globales de `polkadot-api` (sin `>`) en `pnpm-workspace.yaml`, que `pnpm dlx` hereda dentro del repo | Usar los overrides acotados (`padre@versión>hijo`) de `versiones.md` |
+| `verificar-entorno.mjs` marca dos versiones de `@parity/truapi` o de `polkadot-api` | Un selector `padre@versión` ya no coincide (se cambió una versión del SDK) | Volver a las versiones de `versiones.md` y correr `pnpm install` |
 | `Host provider unavailable for chain 0x…` | El código corre fuera de un Host (navegador normal o Node) | Abrir la app dentro de Polkadot Desktop o la Polkadot App; para scripts, leer por ETH-RPC con viem |
 | La IA propone `getChainAPI('paseo')` o `paseo_asset_hub` | Ejemplos de las skills de Parity, que apuntan a Paseo Next v2 | Usar `devnet_asset_hub` (`red-devnet.md`) |
 | `readonly … cannot be assigned to the mutable type 'AbiEntry[]'` | ABI escrita como literal `as const` | Importar la ABI como JSON y castear `as AbiEntry[]` |
@@ -66,19 +68,18 @@ Formato: **síntoma → causa → solución**. Si un síntoma no está aquí, bu
 | `pad` falla por propietario con tu propio nombre | Le pasaste a `pad` el nombre que es de tu teléfono; `pad` firma con su worker | Nunca pasar a `pad` el nombre del teléfono: darle el nombre temporal y pegar el CID a mano en el tuyo |
 | `pad` registró un nombre que no es el tuyo | Con el *pool*, el nombre que le pasas queda a nombre de una cuenta compartida | Usar siempre un nombre temporal (`tmp` + fecha en letras) y solo copiar el CID |
 | `Previous deploy did not exit cleanly. Continuing.` / `Previous deploy was interrupted` | Quedó marca de un intento anterior | Inofensivo |
-| `A newer version of polkadot-app-deploy is available (0.16.7 → 0.20.0)` | Aviso de `pad` sobre otro paquete | Ignorarlo; no actualizar (versión fija 0.16.7) |
+| `WARNING: devnet declares DotNS 1.0.0, newer than 0.8.0 …` | Aviso de `pad` sobre el perfil de DotNS que usa | Inofensivo: `pad` sigue y termina bien |
+| `Revive.call: nonce contention (attempt N/5)` | Varias transacciones compiten por el nonce | Inofensivo: `pad` reintenta solo (hasta 5 veces) |
 | `Update and retry? [Y/n]` tras un fallo | Faltó `PAD_UPDATE_CHECK=0` | Responder `n` y usar el atajo de `publicar.md`, sección 2 |
-| No deja cambiar el `contenthash` | La cuenta no es dueña del nombre; la delegación no se respeta | Hacerlo con la cuenta dueña o desde `dotns.dot` → Profile → Edit |
+| No deja cambiar el `contenthash` | La cuenta no es dueña del nombre (si la delegación sirve: **POR VERIFICAR**, `publicar.md`, sección 3) | Hacerlo con la cuenta dueña o desde `dotns.dot` → Profile → Edit |
 | Icono en blanco | `icon.cid` del registro `manifest` es UnixFS (`bafybei…`) | Subirlo con `pad` (blob crudo blake2b, `bafk2bza…`) y copiar el JSON de `Verified text[manifest]:` |
 | La tarjeta aparece pero la app no abre | El dominio principal no tiene `contenthash` (se agregó el registro `manifest` pero no el CID del bundle) | `dotns.dot` → Profile → My Domains → **Resolve** con el CID `bafy…` y firmar. No hace falta `app.` (`publicar.md`, sección 4) |
-| `Error: domain required (e.g. my-app.dot)` | `APP_DOT` no existe en esa terminal; PowerShell no pasa el argumento vacío | Correr la línea de `APP_DOT` y repetir `pad` en la misma terminal |
-| `Error: Invalid product config at …` con `product config domain must be a non-empty dotNS name ending in one of: .dot, .paseo` | Hay `polkadot-app-deploy.config.mjs` con `domain: process.env.APP_DOT` y `APP_DOT` no está definida (se pasó un nombre a mano) | Definir `APP_DOT` y pasar `$env:APP_DOT` (`"$APP_DOT"`) a `pad`. No sube nada antes del error |
-| `Deployment failed (not retryable): Invalid product config …` con `--no-manifest` | `pad` 0.16.7 carga la config después de subir aunque haya `--no-manifest`, y `APP_DOT` no está definida (según el código) | El CID ya subió; definir `APP_DOT` antes de las próximas corridas |
-| `Config domain '…' (in …) does not match deploy domain '…'` | El `<domain>` pasado a `pad` no es el de `APP_DOT` | El bundle subió pero el manifest no se escribió: repetir usando `$env:APP_DOT` como argumento |
+| `Error: domain required (e.g. my-app.dot)` | `APP_DOT` no existe en esa terminal; PowerShell no pasa el argumento vacío | Correr la línea de `APP_DOT` y repetir `pad` en la misma terminal. Mensaje **POR VERIFICAR** con `pad` 0.22.1 (`publicar.md`, sección 4) |
+| `Error: Invalid product config at …` con `product config domain must be a non-empty dotNS name ending in one of: .dot, .paseo` | Hay `polkadot-app-deploy.config.mjs` con `domain: process.env.APP_DOT` y `APP_DOT` no está definida (se pasó un nombre a mano) | Definir `APP_DOT` y pasar `$env:APP_DOT` (`"$APP_DOT"`) a `pad`. No sube nada antes del error. Mensaje **POR VERIFICAR** con `pad` 0.22.1 |
+| `Config domain '…' (in …) does not match deploy domain '…'` | El `<domain>` pasado a `pad` no es el de `APP_DOT` | El bundle subió pero el manifest no se escribió: repetir usando `$env:APP_DOT` como argumento. Mensaje **POR VERIFICAR** con `pad` 0.22.1 |
 | En Android sale la tarjeta anterior (sin icono o con el manifest viejo) | La Polkadot App para Android no refresca el manifest de una app guardada en marcadores (reportado) | Quitar el marcador, buscar la app otra vez y volver a agregarla |
 | Los acentos del JSON del manifest salen como `r├®cord` | Salida de `pad` capturada por tubería en PowerShell 5.1 | Correr `pad` sin tuberías o corregir los acentos a mano antes de pegar el registro |
 | La app publicada dejó de cargar tras unos días | Bulletin borra el contenido a los ~14 días | Volver a publicar bundle e icono |
 
-Fuentes: app de referencia del equipo, pruebas del equipo (2026-09-23 a 2026-10-03), `pad --help` 0.16.7, las pruebas
-del 2026-10-15 (`versiones.md`), las pruebas del 2026-10-18, la corrida con config + `APP_DOT` del
-2026-10-21 y la prueba del organizador con `polka-man.dot`.
+Fuentes: app de referencia del equipo, la prueba del 2026-10-23 (`versiones.md`), `pad --help` 0.22.1 y la
+prueba del organizador en Android.
