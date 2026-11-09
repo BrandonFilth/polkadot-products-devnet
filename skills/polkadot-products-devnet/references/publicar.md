@@ -226,6 +226,17 @@ export default {
 `domain` se deja como `process.env.APP_DOT`: cada subida usa un nombre temporal nuevo y `pad` exige
 que sea igual al `<domain>` de la línea de comandos. La config va en el commit (no tiene secretos).
 
+**No fijar el dominio propio en `domain`** (p. ej. `domain: 'mi-app.dot'`). `pad` busca la config en
+la carpeta del build y en las de arriba, así que la encuentra aunque corras `pad` desde `app/`, y se
+detiene **antes de subir** (comprobado el 2026-11-09 con `pad` 0.22.1):
+
+```text
+Error: Config domain 'mi-app.dot' (in …\polkadot-app-deploy.config.ts) resolves to 'mi-app.dot', which does not match the deploy target 'tmp….dot' (resolves to 'tmp….dot'). Either update the config's "domain" or pass the matching <domain> arg
+```
+
+Arreglo: `domain: process.env.APP_DOT`, o subir con `--no-manifest`. No pasarle a `pad` el dominio
+propio para que coincidan: `pad` firma con su worker y no es el dueño.
+
 Comportamiento de `pad` 0.22.1 (corrida del 2026-10-23 y `pad --help`):
 
 - Busca la config subiendo desde la carpeta del build (`<build-dir>` y sus carpetas de arriba), o
