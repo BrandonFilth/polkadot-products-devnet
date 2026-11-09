@@ -23,9 +23,9 @@ con la muestra del taller (Polka-Man).
 | `pad` = `@polkadot-community-foundation/polkadot-app-deploy` | 0.22.1 | ✅ `--version` y `--help` desde la raíz del repo con la caché de `pnpm dlx` vacía; publicaciones de 3 min 49 s (`--no-manifest`) y 5 min 09 s (config) |
 | `dotns` = `@polkadot-community-foundation/dotns-cli` | 1.0.0 | ✅ `lookup owner-of`, `text view` y `content view` |
 | CLI `skills` (instalar skills) | 1.7.2 | ✅ prueba del equipo, 2026-10-15: `add <ruta> --list` y `add … -a kiro-cli/claude-code --copy`; declara Node ≥ 22.20.0 y con 22.18 solo avisa `EBADENGINE` |
-| Polkadot App (Android) | `devnet/2026-10-22.1` | ✅ el organizador: conectar la cuenta, permiso de gas, guardar récord y username |
-| Polkadot App (iOS, TestFlight) | versión de devnet más reciente | **POR VERIFICAR**: mismo protocolo, sin prueba propia |
-| Polkadot Desktop | último release de devnet | **POR VERIFICAR**: mismo protocolo, sin prueba propia |
+| Polkadot App (Android) | `devnet/2026-11-05.1` o posterior | ✅ 2026-11-09: Polka-Man firma en el pipeline 1 (`txExtVersion: 1`) y paga la comisión en PGAS. `devnet/2026-10-22.1` solo sirve para el pipeline 0 |
+| Polkadot App (iOS, TestFlight) | `devnet/2026-11-06.2` o posterior | ✅ prueba externa, 2026-11-08 (Lotería en Cadena): pipeline 1, `PGASFeePaid` en el bloque 15,498,137 |
+| Polkadot Desktop | 0.1.4-rc.3 | **POR VERIFICAR** con el pipeline 1. Visto el 2026-11-06: `SmartContractAllowance` respondió `NotAvailable` en una cuenta y luego llegó PGAS en otra prueba |
 | dev-dot.li | — | ✅ carga la app y la app detecta el Host |
 
 ## Por qué estas versiones
@@ -39,6 +39,9 @@ con la muestra del taller (Polka-Man).
   en el árbol de la app y no se aplican a las herramientas que se corren con `pnpm dlx` dentro del repo
   (por ejemplo `pad`). Los overrides globales (sin `>`) sí las alcanzan y rompen `pad`
   (`errores-comunes.md`).
+- El cambio de red del 2026-11-05 (runtime 2005005, pipelines de extensiones) **no** obliga a subir el
+  SDK: `product-sdk-host` 0.28.0 y `product-sdk-signer` 0.17.3 ya aceptan `txExtVersion`. Sí obliga
+  a cambiar el código de la app (`app-sdk.md`, *Pipelines*) y a usar Hosts de esa fecha o posteriores.
 - Si se sube cualquier versión del SDK hay que reescribir los selectores `padre@versión`: si no coinciden,
   dejan de aplicar sin avisar. `scripts/verificar-entorno.mjs` lo detecta (dos versiones de truapi o de
   polkadot-api en `node_modules/.pnpm`).

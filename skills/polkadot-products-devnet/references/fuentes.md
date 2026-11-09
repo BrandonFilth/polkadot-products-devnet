@@ -62,6 +62,13 @@ Para leerlas, usar estos archivos directos (texto plano, commit `941edee`), no l
 Antes de aplicar algo de ellas, revisar la sección *Qué ignorar de las skills de Parity* en
 `SKILL.md`.
 
+## Issues y ejemplos
+
+| URL | Fijación | Qué cubre |
+|---|---|---|
+| https://github.com/paritytech/product-sdk/issues/339 | comentarios hasta 2026-11-05 | `txExtVersion` y los dos pipelines de Asset Hub; el SDK firma en el 0 por defecto (`Invalid.UnknownOrigin` / `Invalid.Payment`) |
+| https://github.com/w3nerick/Loteria-On-Chain/commit/184b13d | commit `184b13d` (PR #19), probado 2026-11-08 en iPhone | Firmante con `getAccountsProvider().getProductAccountSigner(…, { txExtVersion: 1 })` en `src/chain/wallet.js` |
+
 ## Contratos
 
 | URL | Fijación | Qué cubre |

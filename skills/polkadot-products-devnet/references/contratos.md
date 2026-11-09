@@ -153,8 +153,14 @@ Conversión de direcciones (fuente:
 ## Gas
 
 - Desplegar desde Remix: PAS de MetaMask.
-- Llamadas desde la app: **PGAS** de la cuenta del Product, que el Host asigna con
-  `SmartContractAllowance`. El usuario no necesita PAS. Ver `app-sdk.md`.
+- Llamadas desde la app: la comisión se paga con **PGAS** de la cuenta del Product, que el Host
+  asigna con `SmartContractAllowance`, **solo si se firma en el pipeline 1** (`txExtVersion: 1`, ver
+  `app-sdk.md`, *Pipelines*). En el pipeline 0 se cobra en PAS.
+- Depósito de almacenamiento: cada dato nuevo que guarda el contrato (o uno que crece) aparta un
+  depósito, que se devuelve si el dato se borra. No es la comisión. Probablemente se cobra en PAS
+  aunque la cuenta tenga PGAS (**POR VERIFICAR**): la cuenta del usuario puede necesitar unos 0.05 PAS.
+  Para medirlo, la simulación (`ReviveApi.call`) devuelve `storage_deposit`. Guardar menos datos nuevos
+  por usuario reduce el depósito.
 
 ## Seguridad mínima
 

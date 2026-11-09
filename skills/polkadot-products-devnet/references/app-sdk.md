@@ -120,7 +120,7 @@ Fuente: muestra del taller (`polkadot-app-hackaton/game/vite.config.js`), 2026-1
 ```ts
 import { createChainClient } from '@parity/product-sdk/chain';
 import { createContract, createContractRuntimeFromClient, type AbiEntry } from '@parity/product-sdk/contracts';
-import { isInsideContainer, requestResourceAllocation } from '@parity/product-sdk/host';
+import { getAccountsProvider, isInsideContainer, requestResourceAllocation } from '@parity/product-sdk/host';
 import { SignerManager } from '@parity/product-sdk/wallet';
 import { devnet_asset_hub } from '@parity/product-sdk-descriptors/devnet-asset-hub';
 ```
@@ -134,6 +134,7 @@ Comprobado el 2026-10-23: `tsc`, `vite build` y la app dentro de la Polkadot App
 ```ts
 const CONTRACT = '0x…';           // dirección que dio Remix
 const DERIVATION_INDEX = 0;       // índice de la cuenta del Product
+const TX_EXT_VERSION = 1;         // pipeline con AsPgas: la comisión sale de PGAS (ver *Pipelines*)
 
 // 1. ¿Estamos dentro de un Host?
 if (!(await isInsideContainer())) throw new Error('Abre esta app dentro de un Host de Polkadot.');
@@ -148,16 +149,23 @@ const connected = await manager.connect();
 if (!connected.ok) throw connected.error;
 const account = await manager.getProductAccount('mi-app.dot', DERIVATION_INDEX);
 if (!account.ok) throw account.error;
-const me = account.value;          // me.address (SS58), me.h160Address (0x…), me.getSigner()
-// me.getSigner() devuelve un CommonSignerTxCreator (polkadot-api 3)
+const me = account.value;          // me.address (SS58), me.h160Address (0x…), me.publicKey, me.getSigner()
 
-// 4. Contrato con origen y firmante por defecto.
+// 4. Firmante en el pipeline 1. me.getSigner() firma en el 0 (comisión en PAS): no usarlo para Asset Hub.
+const provider = await getAccountsProvider();
+if (!provider) throw new Error('El Host no entregó el proveedor de cuentas.');
+const signer = provider.getProductAccountSigner(
+  { dotNsIdentifier: 'mi-app.dot', derivationIndex: DERIVATION_INDEX, publicKey: me.publicKey },
+  { txExtVersion: TX_EXT_VERSION },
+);
+
+// 5. Contrato con origen y firmante por defecto.
 const contract = createContract(runtime, CONTRACT, abi as AbiEntry[], {
   defaultOrigin: me.address,
-  defaultSigner: me.getSigner(),
+  defaultSigner: signer,
 });
 
-// 5. Gas (PGAS) para la cuenta del Product.
+// 6. Gas (PGAS) para la cuenta del Product.
 const r = await requestResourceAllocation([
   { tag: 'SmartContractAllowance', value: { tag: 'Index', value: DERIVATION_INDEX } },
 ]);
@@ -165,7 +173,56 @@ const outcome = r.ok ? r.value[0] : undefined; // 'Allocated' | 'Rejected' | 'No
 ```
 
 En la app de referencia `dappName` y el id del Product salen del dominio (`productId`), que se deduce de
-la URL (`mi-app.dot`, `mi-app.dot.li`, `mi-app.dev-dot.li` → `mi-app.dot`).
+la URL (`mi-app.dot`, `mi-app.dot.li`, `mi-app.dev-dot.li` → `mi-app.dot`). El mismo `productId` va en
+`dotNsIdentifier` del firmante, con `.dot`.
+
+## Pipelines de extensiones (`txExtVersion`)
+
+Desde el runtime 2005005 de Asset Hub (bloque 15,367,035, 2026-11-05 18:04 UTC; hoy 2005006) la
+metadata v16 declara dos pipelines (`extrinsic.extensionsByVersion`):
+
+| Pipeline | Extensiones | Comisión | Firma |
+|---|---|---|---|
+| 0 | 13: las de sistema + `ChargeAssetTxPayment` | en **PAS** | extrínseca v4 (`0x84`) |
+| 1 | 19: las del 0 + `VerifyMultiSignature`, `AsPgas`, `AsScarcity`, `AsDotnsGateway`, `RestrictOrigins`, `UnitTransactionExtension` | en **PGAS** (evento `PgasAllowance.PGASFeePaid`) | extrínseca v5 general (`0x45`, versión 1) |
+
+Antes del upgrade había un solo pipeline con `AsPgas`. El SDK (`product-sdk-host` 0.28.0,
+`product-sdk-signer` 0.17.3) firma en el 0 si nadie pide otro: `getProductAccountSigner(account,
+{ txExtVersion = 0 })`, y `SignerAccount.getSigner()` lo llama sin opciones. Por eso las apps hechas
+antes del 5 nov empezaron a fallar con `Invalid.Payment` en cuentas sin PAS
+([paritytech/product-sdk#339](https://github.com/paritytech/product-sdk/issues/339)).
+
+Reglas:
+
+- **Asset Hub (contratos):** firmante de `getAccountsProvider().getProductAccountSigner(…, { txExtVersion: 1 })`,
+  como en *Flujo completo*. `createContract` y `SignerManager` no exponen la opción.
+- **Bulletin:** solo declara el pipeline 0. Seguir con `me.getSigner()`; con 1 falla con
+  `chain declares no transaction-extension pipeline version 1`.
+- **Si el Host no acepta el 1** (Desktop 0.1.4-rc.3 no se ha probado), rearmar el firmante con 0 y
+  reintentar una vez: la comisión vuelve a salir de PAS.
+- **Depósito de almacenamiento:** PGAS solo paga la comisión. El depósito de Revive por datos nuevos
+  (p. ej. 0.00528 PAS por el primer username de Polka-Man) se cobró en PAS en la prueba de Lotería en
+  Cadena (fondearon ~0.3 PAS). Sin PAS la simulación puede fallar con
+  `Revive.StorageDepositNotEnoughFunds`. **POR VERIFICAR** con una cuenta sin PAS y el pipeline 1.
+
+Comprobar que pagó con PGAS: en el bloque de la transacción, la extrínseca empieza (tras la longitud)
+con `0x45 01` y aparece `PgasAllowance.PGASFeePaid`. Con el pipeline 0 aparecen
+`TransactionPayment.TransactionFeePaid` y `Balances.Withdraw` (PAS).
+
+Comprobado el 2026-11-08 y 2026-11-09: Lotería en Cadena en iPhone (bloque 15,498,137,
+`PGASFeePaid` 0.0064 PGAS) y Polka-Man en Android con el mismo cambio.
+
+### Actualizar una app hecha antes del 5 nov 2026
+
+1. Constante `TX_EXT_VERSION = 1` junto a `DERIVATION_INDEX`.
+2. Cambiar `defaultSigner: me.getSigner()` por el firmante de `getAccountsProvider()` (arriba). Las
+   subidas a Bulletin se quedan con `me.getSigner()`.
+3. El mensaje de `Invalid.Payment` con PGAS: dejar de decir "actualiza la Polkadot App"; ahora
+   significa que se firmó en el pipeline 0 o que falta PAS.
+4. Probar en un Host actualizado (`versiones.md`) y revisar el bloque como se describe arriba.
+
+Ejemplos: `polkadot-app-hackaton/game/src/hub/hub.ts` (`writer()`, con el reintento en 0) y
+Lotería en Cadena, commit `184b13d`, `src/chain/wallet.js`.
 
 ## Leer: `.query()`
 
@@ -226,7 +283,9 @@ Comprobado desde Node el 2026-10-23 con `test:red` de la muestra contra el `Lead
 | Texto del error | Significado | Qué hacer |
 |---|---|---|
 | `Invalid.Payment` y PGAS bajo | Sin gas | Pedir `SmartContractAllowance` y reintentar una vez |
-| `Invalid.Payment` con PGAS suficiente | El Host armó mal la comisión | Reconectar (nueva cadena + `SignerManager`) y reintentar |
+| `Invalid.Payment` con PGAS suficiente | Se firmó en el pipeline 0: la comisión se cobra en PAS y la cuenta no tiene | Firmar con `txExtVersion: 1` (*Pipelines*); mientras tanto, mandar unos 0.05 PAS a la cuenta |
+| `Revive.StorageDepositNotEnoughFunds` | El depósito de almacenamiento por datos nuevos no alcanza (probablemente se paga en PAS) | Mandar un poco de PAS a la cuenta (*Pipelines*) |
+| `chain declares no transaction-extension pipeline version 1` | Se pidió el pipeline 1 en una cadena que no lo tiene (Bulletin) | Usar `me.getSigner()` en esa cadena |
 | `Invalid.Stale` / `Future` / `nonce` | La sesión de firma se desfasó | Reconectar y reintentar |
 | `reject` / `cancel` / `denied` | El usuario no aprobó | Ofrecer reintentar |
 | `timeout` | El teléfono no respondió a tiempo (la tx pudo entrar) | Leer el estado antes de reintentar |

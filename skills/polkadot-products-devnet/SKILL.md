@@ -59,7 +59,12 @@ Todo está ajustado a **Products Devnet** y a las versiones de `references/versi
 - **SDK:** conectar con `createChainClient({ chains: { assetHub: devnet_asset_hub } })`; no usar
   `getChainAPI()`. En `.tx()`, `waitFor: 'finalized'` (o `'best-block'`).
 - **Simular antes de firmar:** `.query()` antes de cada `.tx()`. Una firma a la vez.
-- **Gas de la app:** PGAS vía `SmartContractAllowance`; el usuario final no necesita PAS.
+- **Gas de la app:** PGAS vía `SmartContractAllowance`, y firmar las llamadas de Asset Hub con
+  `txExtVersion: 1` (`getAccountsProvider().getProductAccountSigner(…, { txExtVersion: 1 })`). Desde
+  el runtime 2005005 (5 nov 2026) `me.getSigner()` firma en el pipeline 0 y la comisión se cobra en
+  PAS: una cuenta con solo PGAS falla con `Invalid.Payment`. Bulletin sigue con `me.getSigner()`.
+  PGAS paga la comisión; el depósito de almacenamiento de Revive (datos nuevos en un contrato)
+  probablemente necesita un poco de PAS (**POR VERIFICAR**). Ver `references/app-sdk.md`, *Pipelines*.
 - **Vite:** `base: './'` y el plugin que deja solo el descriptor del devnet
   (`references/app-sdk.md`, *Vite*).
 - **Probar:** ningún Host se conecta a `localhost`. Conexión, firmas y PGAS solo con la app
@@ -102,7 +107,7 @@ Si una firma de función difiere, gana `references/app-sdk.md`.
 | `references/red-devnet.md` | RPCs, chainId, génesis, Blockscout, Bulletin, faucet, MetaMask, PGAS, descriptor del SDK |
 | `references/versiones.md` | Versiones fijas y resultado de la prueba del 2026-10-23 |
 | `references/contratos.md` | Solidity/REVM, Remix + MetaMask, ABI, tamaño, OpenZeppelin 5.6.1, cuentas y mapeo de direcciones |
-| `references/app-sdk.md` | Sandbox, Vite, `createContract`, `.query()` → `.tx()`, cuenta del Product, PGAS, lecturas por ETH-RPC, plugin de Vite sin metadatos de otras cadenas |
+| `references/app-sdk.md` | Sandbox, Vite, `createContract`, `.query()` → `.tx()`, cuenta del Product, PGAS, pipelines de extensiones (`txExtVersion: 1`) y cómo actualizar una app anterior al 5 nov 2026, lecturas por ETH-RPC, plugin de Vite sin metadatos de otras cadenas |
 | `references/publicar.md` | Dos usos del mismo flujo con `pad`: pruebas con `--no-manifest` y publicación final con config + `APP_DOT` (Resolve + Custom Record `manifest`), nombres `.dot`, `dotns`, icono blake2b, marcadores en Android |
 | `references/errores-comunes.md` | Síntoma → causa → solución |
 | `references/fuentes.md` | Registro curado de fuentes (URL + fijación + qué cubre) |

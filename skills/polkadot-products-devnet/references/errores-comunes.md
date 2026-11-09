@@ -46,7 +46,10 @@ Formato: **síntoma → causa → solución**. Si un síntoma no está aquí, bu
 | Síntoma | Causa | Solución |
 |---|---|---|
 | `Invalid.Payment` y PGAS bajo | La cuenta del Product no tiene gas | `requestResourceAllocation` con `SmartContractAllowance` y reintentar una vez |
-| `Invalid.Payment` aunque hay PGAS | El Host armó mal la comisión | Reconectar (cadena + `SignerManager`) y reintentar; si se repite, actualizar la Polkadot App |
+| `Invalid.Payment` aunque hay PGAS | La app firmó en el pipeline 0 (`me.getSigner()`): desde el runtime 2005005 ese pipeline cobra en PAS | Firmar con `txExtVersion: 1` (`app-sdk.md`, *Pipelines*). Mientras tanto, mandar unos 0.05 PAS a la cuenta. Actualizar la Polkadot App no lo arregla |
+| `Revive.StorageDepositNotEnoughFunds` en la simulación | El contrato guarda datos nuevos y el depósito no alcanza; probablemente se paga en PAS aunque haya PGAS | Mandar un poco de PAS a la cuenta (unos 0.05) |
+| `chain declares no transaction-extension pipeline version 1` | Se pidió el pipeline 1 en una cadena que solo tiene el 0 (Bulletin) | En esa cadena firmar con `me.getSigner()` |
+| `TxSigningRejectedError` sin haber tocado nada (Desktop) | La solicitud no llegó al teléfono o caducó | Repetir con la Polkadot App abierta en primer plano |
 | `Invalid.Stale`, `Future` o errores de `nonce` | La sesión de firma se desfasó | Reconectar y reintentar |
 | Una firma nunca llega al teléfono | Otra firma sigue pendiente; el Host atiende una a la vez | Esperar a que termine la anterior; no firmar en segundo plano |
 | `timeout` al firmar | El usuario no aprobó a tiempo; la tx pudo entrar | Leer el estado del contrato antes de reintentar |

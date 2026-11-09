@@ -65,6 +65,14 @@ Red agregada a mano (Remix no la trae en su lista):
 | Decimales | 10 |
 | Precompile ERC-20 | `0x7735940000000000000000000000000001200000` (formato `0x{assetId:8 hex}` + 24 ceros + `01200000`) |
 | Cómo se obtiene | El Host lo asigna con el recurso `SmartContractAllowance` (ver `app-sdk.md`) |
+| Qué paga | La comisión, **solo** si la transacción va en el pipeline 1 (`txExtVersion: 1`, desde el runtime 2005005). En el pipeline 0 la comisión es en PAS |
+| Qué no paga | Probablemente el depósito de almacenamiento de Revive (datos nuevos en un contrato), que se cobra en PAS. **POR VERIFICAR** |
+
+Cambio de red: el 2026-11-05 a las 18:04 UTC (bloque 15,367,035) Asset Hub pasó del runtime 2005004
+al 2005005 y `AsPgas` se movió al pipeline 1. El 2005006 (2026-11-06) le sigue. Antes,
+`PgasAllowance.PGASFeePaid`; después, con el pipeline 0, `TransactionPayment.TransactionFeePaid` en PAS.
+Comprobado en la cadena por el equipo (cuentas de Polka-Man y Event Tracker). Ver `app-sdk.md`,
+*Pipelines*.
 
 Fuente: app de referencia del equipo. Comprobado el
 2026-10-15 por ETH-RPC: el precompile responde a `totalSupply()`; `symbol()` y `decimals()` revierten
@@ -75,7 +83,8 @@ con `Metadata not found`, así que los decimales se fijan en el código (10).
 | Saldo | Para qué | De dónde sale |
 |---|---|---|
 | PAS en MetaMask | Desplegar contratos desde Remix | Faucet |
-| PGAS de la cuenta del Product | Firmar llamadas a contratos desde la app | Host (`SmartContractAllowance`) |
+| PGAS de la cuenta del Product | Comisión de las llamadas a contratos desde la app (pipeline 1) | Host (`SmartContractAllowance`) |
+| PAS de la cuenta del Product | Depósito de almacenamiento al guardar datos nuevos (probable); comisión si se firma en el pipeline 0 | Faucet o una transferencia a su SS58 |
 | PAS de una cuenta con `.dot` | Depósito del nombre (10 PAS) y publicar | Faucet |
 | CASH | Pagos dentro de la Polkadot App; no paga comisiones | Top-up de la app |
 
