@@ -34,8 +34,7 @@ Todo está ajustado a **Products Devnet** y a las versiones de `references/versi
 5. Citar siempre el archivo o la URL de donde sale el dato.
 6. Si no aparece en ninguna fuente: decir **"no verificado"**, explicar qué habría que probar y no
    inventar APIs, direcciones, versiones ni comandos.
-7. Lo marcado **POR VERIFICAR** en las referencias se presenta como tal, no como hecho.
-8. Si piden revisar una spec: contrastarla con las *Reglas obligatorias* (versiones fijas, red
+7. Si piden revisar una spec: contrastarla con las *Reglas obligatorias* (versiones fijas, red
    Products Devnet, sandbox de `references/app-sdk.md`, publicación con `pad` de
    `references/publicar.md`, una firma a la vez y `.query()` antes de `.tx()`). Responder con una
    lista: qué choca, la referencia que lo respalda y el cambio propuesto a la spec. No escribir
@@ -63,8 +62,8 @@ Todo está ajustado a **Products Devnet** y a las versiones de `references/versi
   `txExtVersion: 1` (`getAccountsProvider().getProductAccountSigner(…, { txExtVersion: 1 })`). Desde
   el runtime 2005005 (5 nov 2026) `me.getSigner()` firma en el pipeline 0 y la comisión se cobra en
   PAS: una cuenta con solo PGAS falla con `Invalid.Payment`. Bulletin sigue con `me.getSigner()`.
-  PGAS paga la comisión; el depósito de almacenamiento de Revive (datos nuevos en un contrato)
-  probablemente necesita un poco de PAS (**POR VERIFICAR**). Ver `references/app-sdk.md`, *Pipelines*.
+  En el pipeline 1, PGAS paga la comisión y también el depósito de almacenamiento de Revive (datos
+  nuevos en un contrato): el usuario no necesita PAS. Ver `references/app-sdk.md`, *Pipelines*.
 - **Vite:** `base: './'` y el plugin que deja solo el descriptor del devnet
   (`references/app-sdk.md`, *Vite*).
 - **Probar:** ningún Host se conecta a `localhost`. Conexión, firmas y PGAS solo con la app

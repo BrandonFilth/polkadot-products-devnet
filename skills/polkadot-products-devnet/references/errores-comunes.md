@@ -46,10 +46,9 @@ Formato: **síntoma → causa → solución**. Si un síntoma no está aquí, bu
 | Síntoma | Causa | Solución |
 |---|---|---|
 | `Invalid.Payment` y PGAS bajo | La cuenta del Product no tiene gas | `requestResourceAllocation` con `SmartContractAllowance` y reintentar una vez |
-| `Invalid.Payment` aunque hay PGAS | La app firmó en el pipeline 0 (`me.getSigner()`): desde el runtime 2005005 ese pipeline cobra en PAS | Firmar con `txExtVersion: 1` (`app-sdk.md`, *Pipelines*). Mientras tanto, mandar unos 0.05 PAS a la cuenta. Actualizar la Polkadot App no lo arregla |
-| `Revive.StorageDepositNotEnoughFunds` en la simulación | El contrato guarda datos nuevos y el depósito no alcanza; probablemente se paga en PAS aunque haya PGAS | Mandar un poco de PAS a la cuenta (unos 0.05) |
+| `Invalid.Payment` aunque hay PGAS | La app firmó en el pipeline 0 (`me.getSigner()`): desde el runtime 2005005 ese pipeline cobra en PAS | Firmar con `txExtVersion: 1` (`app-sdk.md`, *Pipelines*). Actualizar la Polkadot App no lo arregla |
+| `Revive.StorageDepositNotEnoughFunds` en la simulación | El contrato guarda datos nuevos y la cuenta no tiene PGAS ni PAS para el depósito | Pedir `SmartContractAllowance` y reintentar; con el pipeline 1 el depósito sale de PGAS |
 | `chain declares no transaction-extension pipeline version 1` | Se pidió el pipeline 1 en una cadena que solo tiene el 0 (Bulletin) | En esa cadena firmar con `me.getSigner()` |
-| `TxSigningRejectedError` sin haber tocado nada (Desktop) | La solicitud no llegó al teléfono o caducó | Repetir con la Polkadot App abierta en primer plano |
 | `Invalid.Stale`, `Future` o errores de `nonce` | La sesión de firma se desfasó | Reconectar y reintentar |
 | Una firma nunca llega al teléfono | Otra firma sigue pendiente; el Host atiende una a la vez | Esperar a que termine la anterior; no firmar en segundo plano |
 | `timeout` al firmar | El usuario no aprobó a tiempo; la tx pudo entrar | Leer el estado del contrato antes de reintentar |
@@ -74,12 +73,12 @@ Formato: **síntoma → causa → solución**. Si un síntoma no está aquí, bu
 | `WARNING: devnet declares DotNS 1.0.0, newer than 0.8.0 …` | Aviso de `pad` sobre el perfil de DotNS que usa | Inofensivo: `pad` sigue y termina bien |
 | `Revive.call: nonce contention (attempt N/5)` | Varias transacciones compiten por el nonce | Inofensivo: `pad` reintenta solo (hasta 5 veces) |
 | `Update and retry? [Y/n]` tras un fallo | Faltó `PAD_UPDATE_CHECK=0` | Responder `n` y usar el atajo de `publicar.md`, sección 2 |
-| No deja cambiar el `contenthash` | La cuenta no es dueña del nombre (si la delegación sirve: **POR VERIFICAR**, `publicar.md`, sección 3) | Hacerlo con la cuenta dueña o desde `dotns.dot` → Profile → Edit |
+| No deja cambiar el `contenthash` | La cuenta no es dueña del nombre | Hacerlo con la cuenta dueña o desde `dotns.dot` → Profile → Edit |
 | Icono en blanco | `icon.cid` del registro `manifest` es UnixFS (`bafybei…`) | Subirlo con `pad` (blob crudo blake2b, `bafk2bza…`) y copiar el JSON de `Verified text[manifest]:` |
 | La tarjeta aparece pero la app no abre | El dominio principal no tiene `contenthash` (se agregó el registro `manifest` pero no el CID del bundle) | `dotns.dot` → Profile → My Domains → **Resolve** con el CID `bafy…` y firmar. No hace falta `app.` (`publicar.md`, sección 4) |
-| `Error: domain required (e.g. my-app.dot)` | `APP_DOT` no existe en esa terminal; PowerShell no pasa el argumento vacío | Correr la línea de `APP_DOT` y repetir `pad` en la misma terminal. Mensaje **POR VERIFICAR** con `pad` 0.22.1 (`publicar.md`, sección 4) |
-| `Error: Invalid product config at …` con `product config domain must be a non-empty dotNS name ending in one of: .dot, .paseo` | Hay `polkadot-app-deploy.config.mjs` con `domain: process.env.APP_DOT` y `APP_DOT` no está definida (se pasó un nombre a mano) | Definir `APP_DOT` y pasar `$env:APP_DOT` (`"$APP_DOT"`) a `pad`. No sube nada antes del error. Mensaje **POR VERIFICAR** con `pad` 0.22.1 |
-| `Config domain '…' (in …) does not match deploy domain '…'` | El `<domain>` pasado a `pad` no es el de `APP_DOT` | El bundle subió pero el manifest no se escribió: repetir usando `$env:APP_DOT` como argumento. Mensaje **POR VERIFICAR** con `pad` 0.22.1 |
+| `Error: domain required (e.g. my-app.dot)` | `APP_DOT` no existe en esa terminal; PowerShell no pasa el argumento vacío | Correr la línea de `APP_DOT` y repetir `pad` en la misma terminal (`publicar.md`, sección 4) |
+| `Error: Invalid product config at …` con `product config domain must be a non-empty dotNS name ending in a TLD of 2 or more letters (e.g. 'myapp.dot')` | Hay `polkadot-app-deploy.config.mjs` con `domain: process.env.APP_DOT` y `APP_DOT` no está definida (se pasó un nombre a mano) | Definir `APP_DOT` y pasar `$env:APP_DOT` (`"$APP_DOT"`) a `pad`. No sube nada antes del error (exit 78) |
+| `Config domain '…' (in …) resolves to '…', which does not match the deploy target '…'` | El `<domain>` pasado a `pad` no es el `domain` de la config (`APP_DOT` distinto, o la config tiene el dominio fijo) | Usar `domain: process.env.APP_DOT` y pasar `$env:APP_DOT` como argumento. No sube nada antes del error (exit 78) |
 | En Android sale la tarjeta anterior (sin icono o con el manifest viejo) | La Polkadot App para Android no refresca el manifest de una app guardada en marcadores (reportado) | Quitar el marcador, buscar la app otra vez y volver a agregarla |
 | Los acentos del JSON del manifest salen como `r├®cord` | Salida de `pad` capturada por tubería en PowerShell 5.1 | Correr `pad` sin tuberías o corregir los acentos a mano antes de pegar el registro |
 | La app publicada dejó de cargar tras unos días | Bulletin borra el contenido a los ~14 días | Volver a publicar bundle e icono |

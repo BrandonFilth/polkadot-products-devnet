@@ -50,8 +50,7 @@ Red agregada a mano (Remix no la trae en su lista):
   Foundation `0.14.0-pcf.1`, que corresponde al runtime actual de Asset Hub del devnet (`versiones.md`).
 - Conexión: `createChainClient({ chains: { assetHub: devnet_asset_hub } })` desde
   `@parity/product-sdk/chain`. Es el patrón de la app de referencia del equipo.
-- **No usar `getChainAPI()`**: el patrón probado es `createChainClient` con `devnet_asset_hub`. El
-  preset `getChainAPI('devnet')` existe en el SDK pero no se probó: **POR VERIFICAR**.
+- **No usar `getChainAPI()`**: el patrón probado es `createChainClient` con `devnet_asset_hub`.
 - El Host elige el RPC. El SDK **no tiene transporte propio**: fuera de un Host falla con
   `Host provider unavailable for chain 0xd6ee…` (comprobado en Node por el equipo).
 - Lecturas sin Host: ETH-RPC con viem (`readContract`) contra `https://eth-rpc-testnet.polkadot.io`.
@@ -65,8 +64,7 @@ Red agregada a mano (Remix no la trae en su lista):
 | Decimales | 10 |
 | Precompile ERC-20 | `0x7735940000000000000000000000000001200000` (formato `0x{assetId:8 hex}` + 24 ceros + `01200000`) |
 | Cómo se obtiene | El Host lo asigna con el recurso `SmartContractAllowance` (ver `app-sdk.md`) |
-| Qué paga | La comisión, **solo** si la transacción va en el pipeline 1 (`txExtVersion: 1`, desde el runtime 2005005). En el pipeline 0 la comisión es en PAS |
-| Qué no paga | Probablemente el depósito de almacenamiento de Revive (datos nuevos en un contrato), que se cobra en PAS. **POR VERIFICAR** |
+| Qué paga | En el pipeline 1 (`txExtVersion: 1`, desde el runtime 2005005): la comisión **y** el depósito de almacenamiento de Revive. En el pipeline 0 la comisión se cobra en PAS |
 
 Cambio de red: el 2026-11-05 a las 18:04 UTC (bloque 15,367,035) Asset Hub pasó del runtime 2005004
 al 2005005 y `AsPgas` se movió al pipeline 1. El 2005006 (2026-11-06) le sigue. Antes,
@@ -84,7 +82,7 @@ con `Metadata not found`, así que los decimales se fijan en el código (10).
 |---|---|---|
 | PAS en MetaMask | Desplegar contratos desde Remix | Faucet |
 | PGAS de la cuenta del Product | Comisión de las llamadas a contratos desde la app (pipeline 1) | Host (`SmartContractAllowance`) |
-| PAS de la cuenta del Product | Depósito de almacenamiento al guardar datos nuevos (probable); comisión si se firma en el pipeline 0 | Faucet o una transferencia a su SS58 |
+
 | PAS de una cuenta con `.dot` | Depósito del nombre (10 PAS) y publicar | Faucet |
 | CASH | Pagos dentro de la Polkadot App; no paga comisiones | Top-up de la app |
 

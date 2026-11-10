@@ -25,7 +25,6 @@ con la muestra del taller (Polka-Man).
 | CLI `skills` (instalar skills) | 1.7.2 | ✅ prueba del equipo, 2026-10-15: `add <ruta> --list` y `add … -a kiro-cli/claude-code --copy`; declara Node ≥ 22.20.0 y con 22.18 solo avisa `EBADENGINE` |
 | Polkadot App (Android) | `devnet/2026-11-05.1` o posterior | ✅ 2026-11-09: Polka-Man firma en el pipeline 1 (`txExtVersion: 1`) y paga la comisión en PGAS. `devnet/2026-10-22.1` solo sirve para el pipeline 0 |
 | Polkadot App (iOS, TestFlight) | `devnet/2026-11-06.2` o posterior | ✅ prueba externa, 2026-11-08 (Lotería en Cadena): pipeline 1, `PGASFeePaid` en el bloque 15,498,137 |
-| Polkadot Desktop | 0.1.4-rc.3 | **POR VERIFICAR** con el pipeline 1. Visto el 2026-11-06: `SmartContractAllowance` respondió `NotAvailable` en una cuenta y luego llegó PGAS en otra prueba |
 | dev-dot.li | — | ✅ carga la app y la app detecta el Host |
 
 ## Por qué estas versiones

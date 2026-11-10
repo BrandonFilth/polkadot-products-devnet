@@ -32,8 +32,8 @@ Todo lo de este archivo sigue la app de referencia del equipo, probada con `@par
   persona tiene direcciones distintas en `mi-app.dot` y en `otra-app.dot`.
 - Las peticiones HTTP salientes se limitan a los dominios declarados en el manifest
   ([Permisos de Desktop](https://docs.polkadot.com/reference/apps/hosts/polkadot-desktop/permissions/)).
-  El ETH-RPC público se leyó desde el Host en la app de referencia; el detalle de permisos para otros
-  dominios queda **POR VERIFICAR**.
+  El ETH-RPC público (`https://eth-rpc-testnet.polkadot.io`) se lee desde el Host en Polka-Man y en la
+  app de referencia. Usar solo ese origen de red.
 - **Una firma a la vez.** El Host atiende las solicitudes en orden; una segunda firma espera detrás
   de la primera. No lanzar firmas en segundo plano.
 - `getProductContext()` puede no responder: ponerle timeout (3 s en la app de referencia) y deducir el
@@ -198,19 +198,21 @@ Reglas:
   como en *Flujo completo*. `createContract` y `SignerManager` no exponen la opción.
 - **Bulletin:** solo declara el pipeline 0. Seguir con `me.getSigner()`; con 1 falla con
   `chain declares no transaction-extension pipeline version 1`.
-- **Si el Host no acepta el 1** (Desktop 0.1.4-rc.3 no se ha probado), rearmar el firmante con 0 y
-  reintentar una vez: la comisión vuelve a salir de PAS.
-- **Depósito de almacenamiento:** PGAS solo paga la comisión. El depósito de Revive por datos nuevos
-  (p. ej. 0.00528 PAS por el primer username de Polka-Man) se cobró en PAS en la prueba de Lotería en
-  Cadena (fondearon ~0.3 PAS). Sin PAS la simulación puede fallar con
-  `Revive.StorageDepositNotEnoughFunds`. **POR VERIFICAR** con una cuenta sin PAS y el pipeline 1.
+- **Si el Host rechaza el pipeline 1**, rearmar el firmante con 0 y reintentar una vez: la comisión
+  vuelve a salir de PAS.
+- **Depósito de almacenamiento:** con el pipeline 1 también se descuenta de PGAS. Comprobado el
+  2026-11-09 (bloque 15,513,966, runtime 2005006): una cuenta nueva con 0 PAS y 5 PGAS guardó su
+  primer username en Polka-Man; su PGAS bajó 0.007323 (0.00204 de comisión + 0.00528 de depósito) y el
+  PAS siguió en 0. Una cuenta con 0 PAS y 0 PGAS falla en la simulación con
+  `Revive.StorageDepositNotEnoughFunds`: hay que pedir `SmartContractAllowance` primero.
 
 Comprobar que pagó con PGAS: en el bloque de la transacción, la extrínseca empieza (tras la longitud)
 con `0x45 01` y aparece `PgasAllowance.PGASFeePaid`. Con el pipeline 0 aparecen
 `TransactionPayment.TransactionFeePaid` y `Balances.Withdraw` (PAS).
 
 Comprobado el 2026-11-08 y 2026-11-09: Lotería en Cadena en iPhone (bloque 15,498,137,
-`PGASFeePaid` 0.0064 PGAS) y Polka-Man en Android con el mismo cambio.
+`PGASFeePaid` 0.0064 PGAS) y Polka-Man en Android (bloque 15,513,966, extrínseca `0x45 01`,
+`PGASFeePaid`).
 
 ### Actualizar una app hecha antes del 5 nov 2026
 
@@ -218,7 +220,7 @@ Comprobado el 2026-11-08 y 2026-11-09: Lotería en Cadena en iPhone (bloque 15,4
 2. Cambiar `defaultSigner: me.getSigner()` por el firmante de `getAccountsProvider()` (arriba). Las
    subidas a Bulletin se quedan con `me.getSigner()`.
 3. El mensaje de `Invalid.Payment` con PGAS: dejar de decir "actualiza la Polkadot App"; ahora
-   significa que se firmó en el pipeline 0 o que falta PAS.
+   significa que se firmó en el pipeline 0.
 4. Probar en un Host actualizado (`versiones.md`) y revisar el bloque como se describe arriba.
 
 Ejemplos: `polkadot-app-hackaton/game/src/hub/hub.ts` (`writer()`, con el reintento en 0) y
@@ -283,8 +285,8 @@ Comprobado desde Node el 2026-10-23 con `test:red` de la muestra contra el `Lead
 | Texto del error | Significado | Qué hacer |
 |---|---|---|
 | `Invalid.Payment` y PGAS bajo | Sin gas | Pedir `SmartContractAllowance` y reintentar una vez |
-| `Invalid.Payment` con PGAS suficiente | Se firmó en el pipeline 0: la comisión se cobra en PAS y la cuenta no tiene | Firmar con `txExtVersion: 1` (*Pipelines*); mientras tanto, mandar unos 0.05 PAS a la cuenta |
-| `Revive.StorageDepositNotEnoughFunds` | El depósito de almacenamiento por datos nuevos no alcanza (probablemente se paga en PAS) | Mandar un poco de PAS a la cuenta (*Pipelines*) |
+| `Invalid.Payment` con PGAS suficiente | Se firmó en el pipeline 0: la comisión se cobra en PAS y la cuenta no tiene | Firmar con `txExtVersion: 1` (*Pipelines*) |
+| `Revive.StorageDepositNotEnoughFunds` | La cuenta no tiene PGAS (ni PAS) para el depósito de almacenamiento | Pedir `SmartContractAllowance` y reintentar |
 | `chain declares no transaction-extension pipeline version 1` | Se pidió el pipeline 1 en una cadena que no lo tiene (Bulletin) | Usar `me.getSigner()` en esa cadena |
 | `Invalid.Stale` / `Future` / `nonce` | La sesión de firma se desfasó | Reconectar y reintentar |
 | `reject` / `cancel` / `denied` | El usuario no aprobó | Ofrecer reintentar |

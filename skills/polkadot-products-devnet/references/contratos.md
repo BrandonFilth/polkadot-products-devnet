@@ -67,10 +67,6 @@ export const miContratoAbi = abiJson as AbiEntry[];
 Para tokens y permisos, usar la librería en vez de escribir el código. Remix resuelve los `import`
 de OpenZeppelin sin instalar nada.
 
-**POR VERIFICAR** en Remix: fijar la versión escribiendo `@openzeppelin/contracts@5.6.1/...` en el
-`import`, y qué versión toma Remix cuando el `import` no la lleva. La más reciente en npm el
-2026-10-15 es 5.6.1.
-
 ERC-20 (puntos, recompensas):
 
 ```solidity
@@ -116,9 +112,7 @@ contract Constancia is ERC721, Ownable {
 }
 ```
 
-Los dos ejemplos compilan con solc 0.8.28 y OZ 5.6.1 (comprobado 2026-10-15). Un ERC-20 y un ERC-721
-no transferible con OZ 5.6.1 se desplegaron y funcionaron en el devnet según el capítulo 3 del
-bootcamp; el despliegue de estos dos archivos exactos queda **POR VERIFICAR**.
+Los dos ejemplos compilan con solc 0.8.28 y OZ 5.6.1 (comprobado 2026-10-15).
 
 Diferencias de OZ 5 que confunden a las IAs entrenadas con OZ 4:
 
@@ -156,11 +150,11 @@ Conversión de direcciones (fuente:
 - Llamadas desde la app: la comisión se paga con **PGAS** de la cuenta del Product, que el Host
   asigna con `SmartContractAllowance`, **solo si se firma en el pipeline 1** (`txExtVersion: 1`, ver
   `app-sdk.md`, *Pipelines*). En el pipeline 0 se cobra en PAS.
-- Depósito de almacenamiento: cada dato nuevo que guarda el contrato (o uno que crece) aparta un
-  depósito, que se devuelve si el dato se borra. No es la comisión. Probablemente se cobra en PAS
-  aunque la cuenta tenga PGAS (**POR VERIFICAR**): la cuenta del usuario puede necesitar unos 0.05 PAS.
-  Para medirlo, la simulación (`ReviveApi.call`) devuelve `storage_deposit`. Guardar menos datos nuevos
-  por usuario reduce el depósito.
+- Depósito de almacenamiento: cada dato nuevo que guarda el contrato (o uno que crece) cobra un
+  depósito, aparte de la comisión. Con el pipeline 1 se descuenta de PGAS: el usuario no necesita PAS.
+  La simulación (`ReviveApi.call`) devuelve el monto en `storage_deposit`; en el `Leaderboard` de
+  Polka-Man, un username nuevo cuesta 0.00528 y la comisión 0.00204 (comprobado en la cadena el
+  2026-11-09, bloque 15,513,966). Guardar menos datos nuevos por usuario reduce el depósito.
 
 ## Seguridad mínima
 

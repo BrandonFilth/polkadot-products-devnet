@@ -43,8 +43,6 @@ $env:DOTNS_ENV = "devnet"
   Register → Continue → firmar en el teléfono. Es el flujo del capítulo 5, sección 8 del tutorial
   ("Compra tu dominio .dot", con captura).
 - ¿Está libre? `dotns lookup owner-of <etiqueta> --env devnet`.
-- Alternativa por CLI (no es el método del taller): `dotns register domain --name <etiqueta> --env devnet`;
-  necesita una cuenta en el keystore de `dotns`. No se repitió el 2026-10-15: **POR VERIFICAR**.
 
 Fuentes: [Register a .dot domain](https://docs.polkadot.com/apps/register-dot-domain/),
 [PoP rules and pricing](https://docs.polkadot.com/reference/apps/infrastructure/dotns/poprules-pricing/).
@@ -203,7 +201,7 @@ un nombre temporal, con `--no-manifest` y con config + `APP_DOT`).
   CID en "IPFS Hash or Gateway URL", *Save* y firmar en el teléfono.
 - **Solo si la cuenta del keystore de `dotns` es dueña del nombre (no es el método del taller):**
   `dotns content set mi-app-hackaton.dot <CID> --env devnet`.
-- **Solo el dueño** puede cambiar el `contenthash`. La delegación: **POR VERIFICAR**.
+- **Solo el dueño** puede cambiar el `contenthash`.
 
 ## 4. Nombre, descripción e icono (manifest)
 
@@ -244,14 +242,15 @@ Comportamiento de `pad` 0.22.1 (corrida del 2026-10-23 y `pad --help`):
 - Las rutas (`icon.path`, `executables[].path`) son relativas a la carpeta de la config. Si
   `executables` apunta a la misma carpeta del build, reutiliza su CID
   (`Executable [app] reused build-dir CID`).
-- Mensajes de error de dominio y config (no se repitieron con `pad` 0.22.1: **POR VERIFICAR**):
-  - sin `<domain>` en la línea de comandos: `Error: domain required (e.g. my-app.dot)`;
+- Mensajes de error de dominio y config (comprobados el 2026-11-09 con `pad` 0.22.1; ninguno sube
+  nada):
+  - sin `<domain>` en la línea de comandos: `Error: domain required (e.g. my-app.dot)` (exit 1);
   - con un nombre a mano y `APP_DOT` sin definir:
-    `Error: Invalid product config at …: product config domain must be a non-empty dotNS name ending in one of: .dot, .paseo`
-    (exit 78), sin subir nada;
-  - si `APP_DOT` y el `<domain>` no coinciden:
-    `Config domain '…' (in …) does not match deploy domain '…'`, **después** de subir (bundle
-    subido, manifest sin escribir). Pasar siempre `$env:APP_DOT` (`"$APP_DOT"`) como argumento.
+    `Error: Invalid product config at …: product config domain must be a non-empty dotNS name ending in a TLD of 2 or more letters (e.g. 'myapp.dot')`
+    (exit 78);
+  - si el `domain` de la config y el `<domain>` no coinciden:
+    `Config domain '…' (in …) resolves to '…', which does not match the deploy target '…'` (exit 78).
+    Pasar siempre `$env:APP_DOT` (`"$APP_DOT"`) como argumento.
 - Con `--no-manifest` sube solo el bundle y no escribe el manifest. Con
   `polkadot-app-deploy.config.mjs` presente y `APP_DOT` sin definir terminó con exit 0 (corrida del
   2026-10-23).

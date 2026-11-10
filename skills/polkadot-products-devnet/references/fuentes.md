@@ -120,7 +120,7 @@ Fallas del devnet: https://github.com/Polkadot-Community-Foundation/products-dev
 
 Lo que no sale de una URL de este registro viene de pruebas del equipo de Polkadot México
 (app de referencia y material del bootcamp, septiembre–octubre 2026) y ya está resumido en
-`references/`, con fecha y marca **POR VERIFICAR** donde no se repitió.
+`references/`, con su fecha.
 
 Contrato de prueba en el devnet: `Leaderboard` en `0x0aAf511a454c6A522b37210ca6931Cde1c400Ac9`
 (Blockscout: https://blockscout-testnet.polkadot.io/address/0x0aAf511a454c6A522b37210ca6931Cde1c400Ac9).
